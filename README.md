@@ -1,1 +1,1 @@
-# team-java-project
+ EthioMentor
