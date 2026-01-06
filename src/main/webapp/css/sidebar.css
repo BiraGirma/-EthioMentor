@@ -1,0 +1,128 @@
+/* ==========================
+   SIDEBAR
+========================== */
+.sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: #2C1810;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    box-shadow: 4px 0 12px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+/* Logo */
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, #D4AF37 0%, #FFCD4A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Navigation */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-radius: 24px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #E5E7EB;
+    background: rgba(255, 255, 255, 0.03);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-item:hover {
+    background: rgba(212, 175, 55, 0.15);
+    color: #D4AF37;
+    transform: translateX(6px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.nav-item.active {
+    background: #D4AF37;
+    color: #2C1810;
+    box-shadow: 0 6px 12px rgba(212, 175, 55,0.5);
+}
+
+/* Bubble Indicator */
+.nav-item .bubble {
+    position: absolute;
+    right: -20px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #D4AF37;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover .bubble {
+    right: 16px;
+    opacity: 1;
+    transform: scale(1.3);
+}
+
+/* Footer / Logout */
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fca5a5;
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 16px;
+    transition: all 0.25s ease;
+}
+
+.logout-btn:hover {
+    color: #FF7F50;
+    transform: translateX(4px);
+    background: rgba(255,255,255,0.05);
+}
+
+/* Sidebar collapse */
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.sidebar.collapsed .nav-text,
+.sidebar.collapsed .logo-text {
+    display: none; /* Hide text when collapsed */
+}
+
+.sidebar.collapsed .collapse-btn {
+    transform: rotate(180deg);
+}
+
+.main-content.collapsed {
+    margin-left: 80px; /* Adjust main content when sidebar collapsed */
+}
+
+/* Optional: reduce icon size slightly */
+.sidebar.collapsed .nav-item .icon {
+    font-size: 20px;
+    justify-content: center;
+}
+
