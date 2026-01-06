@@ -8,7 +8,7 @@ public class DBInit {
 
     private static final String SUPER_URL = "jdbc:postgresql://localhost:5433/";
     private static final String SUPER_USER = "postgres";
-    private static final String SUPER_PASSWORD = "Abgr@#4132";
+    private static final String SUPER_PASSWORD = "ABC123TM0";
 
     private static final String DB_NAME = "ethiomentors";
 
@@ -66,34 +66,81 @@ public class DBInit {
                     )
                 """);
 
-                // MESSAGES table
+                // STUDY_GROUP_MEMBERS table
+                st.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS study_group_members (
+                        group_id INT REFERENCES study_groups(id) ON DELETE CASCADE,
+                        user_id INT REFERENCES users(id) ON DELETE CASCADE,
+                        PRIMARY KEY (group_id, user_id)
+                    )
+                """);
+
+                // CONVERSATIONS table
+                st.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS conversations (
+                        id SERIAL PRIMARY KEY,
+                        type VARCHAR(20) NOT NULL CHECK (type IN ('PRIVATE','GROUP')),
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """);
+
+                // CONVERSATION PARTICIPANTS table
+                st.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS conversation_participants (
+                        conversation_id INT REFERENCES conversations(id) ON DELETE CASCADE,
+                        user_id INT REFERENCES users(id) ON DELETE CASCADE,
+                        joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        PRIMARY KEY (conversation_id, user_id)
+                    )
+                """);
+
+                // MESSAGES table (extended)
                 st.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS messages (
                         id SERIAL PRIMARY KEY,
                         sender_id INT REFERENCES users(id) ON DELETE CASCADE,
                         recipient_id INT REFERENCES users(id) ON DELETE CASCADE,
+                        conversation_id INT REFERENCES conversations(id) ON DELETE CASCADE,
                         content TEXT NOT NULL,
+                        type VARCHAR(20) DEFAULT 'TEXT',
+                        edited BOOLEAN DEFAULT FALSE,
                         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """);
+
+                // MESSAGE STATUS table
+                st.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS message_status (
+                        message_id INT REFERENCES messages(id) ON DELETE CASCADE,
+                        user_id INT REFERENCES users(id) ON DELETE CASCADE,
+                        status VARCHAR(20) NOT NULL CHECK (status IN ('SENT','DELIVERED','READ')),
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        PRIMARY KEY (message_id, user_id)
+                    )
+                """);
+
+                // GROUP_CONVERSATIONS table
+                st.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS group_conversations (
+                        group_id INT REFERENCES study_groups(id) ON DELETE CASCADE,
+                        conversation_id INT REFERENCES conversations(id) ON DELETE CASCADE,
+                        PRIMARY KEY (group_id, conversation_id)
                     )
                 """);
 
                 // Optional: Insert initial admin if not exists
                 st.executeUpdate("""
                     INSERT INTO users (username, full_name, email, password, role, university)
-                    SELECT 'admin', 'Admin User', 'admin@ethiomentor.com', '$2a$12$N0w3IKmGHRyZZeXQlvh9Oex1PlR39rIWxVn.6tMi2cT6t8R0N1k6i', 'admin', 'Addis Ababa University'
+                    SELECT 'admin', 'Admin User', 'admin@ethiomentor.com',
+                        '$2a$12$N0w3IKmGHRyZZeXQlvh9Oex1PlR39rIWxVn.6tMi2cT6t8R0N1k6i',
+                        'admin', 'Addis Ababa University'
                     WHERE NOT EXISTS (SELECT 1 FROM users WHERE username='admin')
                 """);
-                st.executeUpdate("""
-                       CREATE TABLE IF NOT EXISTS study_group_members (
-                		group_id INT REFERENCES study_groups(id) ON DELETE CASCADE,
-                		user_id INT REFERENCES users(id) ON DELETE CASCADE,
-                		PRIMARY KEY (group_id, user_id)
-                		)""");
-                st.executeUpdate("CREATE TABLE IF NOT EXISTS study_group_members (\r\n"
-                		+ "    group_id INT REFERENCES study_groups(id) ON DELETE CASCADE,\r\n"
-                		+ "    user_id INT REFERENCES users(id) ON DELETE CASCADE,\r\n"
-                		+ "    PRIMARY KEY (group_id, user_id)\r\n"
-                		+ ");");               
+
+                // Indexes for performance
+                st.executeUpdate("CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id, timestamp DESC)");
+                st.executeUpdate("CREATE INDEX IF NOT EXISTS idx_message_status_user ON message_status(user_id, status)");
+
                 System.out.println("Tables created or verified successfully.");
             }
 
