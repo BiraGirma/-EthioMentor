@@ -1,24 +1,5 @@
 package com.ethiomentor.service;
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-import com.ethiomentor.config.DBConfig;
-
-import java.sql.Connection;
-import java.sql.Statement;
-
-public class AdminService {
-
-    public void deactivateUser(int userId) throws Exception {
-        try (Connection con = DBConfig.getConnection();
-             Statement st = con.createStatement()) {
-
-            st.executeUpdate(
-                "UPDATE users SET is_active = false WHERE id = " + userId
-            );
-=======
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 import com.ethiomentor.dao.AdminDAO;
 import com.ethiomentor.model.User;
 import com.ethiomentor.model.StudyGroup;
@@ -43,6 +24,22 @@ public class AdminService {
     public void deleteUser(int userId) {
         try {
             dao.deleteUser(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deactivateUser(int userId) {
+        try {
+            dao.updateUserActiveStatus(userId, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void activateUser(int userId) {
+        try {
+            dao.updateUserActiveStatus(userId, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -117,10 +114,6 @@ public class AdminService {
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
-<<<<<<< HEAD
-=======
->>>>>>> 8fb5b46 (finilized)
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
         }
     }
 }

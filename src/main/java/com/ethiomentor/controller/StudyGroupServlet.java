@@ -16,7 +16,8 @@ public class StudyGroupServlet extends HttpServlet {
     private final StudyGroupDAO dao = new StudyGroupDAO();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user");
@@ -34,26 +35,19 @@ public class StudyGroupServlet extends HttpServlet {
         List<StudyGroup> joinedGroups = dao.getJoinedGroups(userId);
         List<StudyGroup> createdGroups = dao.getCreatedGroups(userId);
 
+        // Debug logs (safe to keep)
+        System.out.println("All groups: " + allGroups.size());
+        System.out.println("Random groups: " + randomGroups.size());
+        System.out.println("Joined groups: " + joinedGroups.size());
+        System.out.println("Created groups: " + createdGroups.size());
+
         // Set attributes for JSP
         req.setAttribute("groups", allGroups);
         req.setAttribute("randomGroups", randomGroups);
         req.setAttribute("joinedGroups", joinedGroups);
         req.setAttribute("createdGroups", createdGroups);
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
-        System.out.println("All groups: " + allGroups.size());
-        System.out.println("Random groups: " + randomGroups.size());
-        System.out.println("Joined groups: " + joinedGroups.size());
-        System.out.println("Created groups: " + createdGroups.size());
-<<<<<<< HEAD
-=======
->>>>>>> 8fb5b46 (finilized)
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 
-        req.getRequestDispatcher("/WEB-INF/jsp/studygroups.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/jsp/studygroups.jsp")
+           .forward(req, resp);
     }
 }
-

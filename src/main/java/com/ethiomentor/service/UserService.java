@@ -22,26 +22,16 @@ public class UserService {
             // Hash password
             user.setPassword(PasswordUtil.hash(user.getPassword()));
 
-            // Normalize role to lowercase (must match DB check constraint)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-            user.setRole(user.getRole().toLowerCase().trim());
-=======
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
+            // Normalize role to match DB check constraint
             String role = user.getRole().toUpperCase().trim();
 
             if ("MENTEE".equals(role)) {
-                user.setRole("student");   // 👈 MUST match DB
+                user.setRole("student");   // MUST match DB
             } else if ("MENTOR".equals(role)) {
                 user.setRole("mentor");
             } else {
                 user.setRole("student");   // safe default
             }
-<<<<<<< HEAD
-=======
->>>>>>> 8fb5b46 (finilized)
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 
             // Save user to database
             userDAO.save(user);

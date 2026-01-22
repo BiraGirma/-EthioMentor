@@ -2,10 +2,11 @@ package com.ethiomentor.controller;
 
 import com.ethiomentor.model.User;
 import com.ethiomentor.service.UserService;
+
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
-import javax.servlet.ServletException;
 
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
@@ -13,23 +14,14 @@ public class RegisterServlet extends HttpServlet {
     private final UserService userService = new UserService();
 
     @Override
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // show registration page
+        // Show registration page
         req.getRequestDispatcher("/register.jsp").forward(req, resp);
     }
 
     @Override
-<<<<<<< HEAD
-=======
->>>>>>> 8fb5b46 (finilized)
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -52,27 +44,14 @@ public class RegisterServlet extends HttpServlet {
 
         if (success) {
             HttpSession session = req.getSession();
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-            session.setAttribute("user", user); // ✅ FIX
-            resp.sendRedirect(req.getContextPath() + "/dashboard");
-        } else {
-            req.setAttribute("error", "Registration failed.");
-            req.getRequestDispatcher("register.jsp").forward(req, resp);
-=======
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
             session.setAttribute("user", user);
             session.setAttribute("userId", user.getId());
             session.setAttribute("role", user.getRole());
+
             resp.sendRedirect(req.getContextPath() + "/dashboard");
         } else {
             req.setAttribute("error", "Registration failed.");
             req.getRequestDispatcher("/register.jsp").forward(req, resp);
-<<<<<<< HEAD
-=======
->>>>>>> 8fb5b46 (finilized)
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
         }
     }
 }

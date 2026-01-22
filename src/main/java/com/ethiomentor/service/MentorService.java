@@ -1,58 +1,63 @@
 package com.ethiomentor.service;
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-import com.ethiomentor.dao.MentorDAO;
-=======
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 import com.ethiomentor.dao.GroupDAO;
 import com.ethiomentor.dao.UserDAO;
 import com.ethiomentor.dao.MentorDAO;
 import com.ethiomentor.model.User;
-<<<<<<< HEAD
-=======
->>>>>>> 8fb5b46 (finilized)
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 import com.ethiomentor.model.MentorProfile;
 
 import java.util.List;
 
+/**
+ * Service layer for mentor-related operations.
+ */
 public class MentorService {
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-    private final MentorDAO mentorDAO = new MentorDAO();
-
-    // Save mentor profile
-    public void createProfile(MentorProfile profile) throws Exception {
-        mentorDAO.saveProfile(profile);
-    }
-
-    // Fetch all mentors
-=======
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
     private final UserDAO userDAO = new UserDAO();
     private final GroupDAO groupDAO = new GroupDAO();
     private final MentorDAO mentorDAO = new MentorDAO();
 
-    // Fetch mentees assigned to this mentor
+    /**
+     * Fetch all mentees assigned to a specific mentor.
+     *
+     * @param mentorId mentor's user ID
+     * @return list of mentees
+     */
     public List<User> getAssignedMentees(int mentorId) {
-        return userDAO.getMenteesByMentor(mentorId);
+        try {
+            return userDAO.getMenteesByMentor(mentorId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of(); // return empty list on error
+        }
     }
 
-    // Fetch study groups created by this mentor
+    /**
+     * Fetch names of study groups created by this mentor.
+     *
+     * @param mentorId mentor's user ID
+     * @return list of group names
+     */
     public List<String> getMentorStudyGroups(int mentorId) {
-        return groupDAO.getGroupsCreatedByMentor(mentorId);
+        try {
+            return groupDAO.getGroupsCreatedByMentor(mentorId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of(); // return empty list on error
+        }
     }
 
-    // Fetch all mentor profiles for mentor matching
-<<<<<<< HEAD
-=======
->>>>>>> 8fb5b46 (finilized)
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
+    /**
+     * Fetch all mentor profiles for mentor matching.
+     *
+     * @return list of mentor profiles
+     */
     public List<MentorProfile> getAllMentors() {
-        return mentorDAO.getAllMentors();
+        try {
+            return mentorDAO.getAllMentors();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of(); // return empty list on error
+        }
     }
 }

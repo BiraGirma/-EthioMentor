@@ -1,20 +1,9 @@
 package com.ethiomentor.controller;
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-import com.ethiomentor.service.AdminService;
-import com.ethiomentor.util.JsonUtil;
-
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
-
-@WebServlet("/api/admin")
-=======
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 import com.ethiomentor.model.StudyGroup;
 import com.ethiomentor.model.User;
 import com.ethiomentor.service.AdminService;
+import com.ethiomentor.util.JsonUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,31 +13,11 @@ import java.util.Collections;
 import java.util.List;
 
 @WebServlet("/admin")
-<<<<<<< HEAD
-=======
->>>>>>> 8fb5b46 (finilized)
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 public class AdminServlet extends HttpServlet {
 
     private final AdminService service = new AdminService();
 
     @Override
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        try {
-            int userId = Integer.parseInt(req.getParameter("userId"));
-            service.deactivateUser(userId);
-            JsonUtil.send(resp, 200, "{\"message\":\"User deactivated\"}");
-
-        } catch (Exception e) {
-            try {
-                JsonUtil.send(resp, 400, "{\"error\":\"" + e.getMessage() + "\"}");
-            } catch (Exception ignored) {}
-        }
-=======
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
@@ -142,9 +111,5 @@ public class AdminServlet extends HttpServlet {
         }
 
         res.sendRedirect(req.getContextPath() + "/admin");
-<<<<<<< HEAD
-=======
->>>>>>> 8fb5b46 (finilized)
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
     }
 }

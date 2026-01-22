@@ -13,26 +13,25 @@ public class AdminDAO {
     /* ===== USERS ===== */
     public List<User> getAllUsersExcept(int excludeUserId) throws Exception {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT id, username, full_name, role, university, mentor_status FROM users WHERE id <> ? ORDER BY id ASC";
+        String sql = "SELECT id, username, full_name, role, university, mentor_status, is_active " +
+                     "FROM users WHERE id <> ? ORDER BY id ASC";
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, excludeUserId);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                User u = new User();
-                u.setId(rs.getInt("id"));
-                u.setUsername(rs.getString("username"));
-                u.setFullName(rs.getString("full_name"));
-                u.setRole(rs.getString("role"));
-                u.setUniversity(rs.getString("university"));
-                u.setMentorStatus(rs.getString("mentor_status"));
-                users.add(u);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User u = new User();
+                    u.setId(rs.getInt("id"));
+                    u.setUsername(rs.getString("username"));
+                    u.setFullName(rs.getString("full_name"));
+                    u.setRole(rs.getString("role"));
+                    u.setUniversity(rs.getString("university"));
+                    u.setMentorStatus(rs.getString("mentor_status"));
+                    
+                    users.add(u);
+                }
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return users;
     }
@@ -43,15 +42,24 @@ public class AdminDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+    }
+
+    public void updateUserActiveStatus(int userId, boolean active) throws Exception {
+        String sql = "UPDATE users SET is_active=? WHERE id=?";
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, active);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
         }
     }
 
     /* ===== MENTOR REQUESTS ===== */
     public List<User> getPendingMentorRequests() throws Exception {
         List<User> mentors = new ArrayList<>();
-        String sql = "SELECT id, full_name, email, university FROM users WHERE role='mentor' AND mentor_status='PENDING' ORDER BY id ASC";
+        String sql = "SELECT id, full_name, email, university FROM users " +
+                     "WHERE role='mentor' AND mentor_status='PENDING' ORDER BY id ASC";
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -64,9 +72,6 @@ public class AdminDAO {
                 u.setUniversity(rs.getString("university"));
                 mentors.add(u);
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return mentors;
     }
@@ -78,8 +83,6 @@ public class AdminDAO {
             ps.setString(1, status);
             ps.setInt(2, userId);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -99,9 +102,6 @@ public class AdminDAO {
                 g.setMembersCount(rs.getInt("members_count"));
                 groups.add(g);
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return groups;
     }
@@ -112,8 +112,6 @@ public class AdminDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, groupId);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -124,8 +122,6 @@ public class AdminDAO {
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return 0;
     }
@@ -136,8 +132,6 @@ public class AdminDAO {
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return 0;
     }
@@ -148,8 +142,6 @@ public class AdminDAO {
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return 0;
     }

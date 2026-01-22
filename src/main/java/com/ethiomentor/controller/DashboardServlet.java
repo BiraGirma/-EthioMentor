@@ -1,20 +1,10 @@
 package com.ethiomentor.controller;
 
-<<<<<<< HEAD
-import com.ethiomentor.config.DBConfig;
-=======
-<<<<<<< HEAD
-import com.ethiomentor.util.DBConnection;
-
-=======
-import com.ethiomentor.config.DBConfig;
->>>>>>> 8fb5b46 (finilized)
->>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.sql.*;
+
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
 
