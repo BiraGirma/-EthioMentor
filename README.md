@@ -250,7 +250,7 @@ Run the project on **Tomcat 9.0.* ** using **Run on Server**.
 
 | Admin Dashboard                                      | 
 | ---------------------------------------------------- | 
-| ![admin-dashboard](assets/admin/admin-dashboard.png) | 
+| ![admin-dashboard](assets/admin-dashboard.png) | 
 
 ---
 
