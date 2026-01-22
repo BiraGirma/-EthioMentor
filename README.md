@@ -24,11 +24,11 @@ Ethiomentor is a **peer mentoring platform for Ethiopian university students**, 
 
 Ethiomentor connects university students with peers and mentors to enhance academic performance and collaboration. The platform supports:
 
-- **User Registration & Login 🔐** – Secure authentication for students and admins.
-- **Dashboard 📊** – Overview of activities, groups, and chats.
-- **Mentor Matching 🤝** – Connect mentees with available mentors.
-- **Study Groups 📚** – Create, join, and manage study groups.
-- **Chat System 💬** – Real-time messaging between users.
+* **User Registration & Login 🔐** – Secure authentication for students and admins.
+* **Dashboard 📊** – Overview of activities, groups, and chats.
+* **Mentor Matching 🤝** – Connect mentees with available mentors.
+* **Study Groups 📚** – Create, join, and manage study groups.
+* **Chat System 💬** – Real-time messaging between users.
 
 The backend is built using **Java Servlets ☕** and **JSP**, with a **PostgreSQL 🐘** database, and the frontend uses HTML, CSS, and JavaScript.
 
@@ -38,6 +38,7 @@ The backend is built using **Java Servlets ☕** and **JSP**, with a **PostgreSQ
 
 ```
 Ethiomentor/
+├── pom.xml
 └── src/
     └── main/
         ├── java/
@@ -56,6 +57,8 @@ Ethiomentor/
         │       │   ├── LogoutServlet.java
         │       │   ├── MentorMatchingServlet.java
         │       │   ├── MessageServlet.java
+        │       │   ├── LoadMessagesServlet.java
+        │       │   ├── MentorDashboardServlet.java
         │       │   ├── RegisterServlet.java
         │       │   ├── StartupServlet.java
         │       │   ├── StudyGroupServlet.java
@@ -87,6 +90,8 @@ Ethiomentor/
         │       └── util/
         │           ├── JsonUtil.java
         │           └── PasswordUtil.java
+        ├── resources/
+        │   └── application.properties (optional)
         └── webapp/
             ├── META-INF/
             │   └── MANIFEST.MF
@@ -115,13 +120,16 @@ Ethiomentor/
             │   ├── chat.js
             │   ├── landing.js
             │   ├── login.js
-            │   └── studygroups.js
+            │   ├── studygroups.js
+            │   └── admin.js
             ├── index.jsp
             ├── login.jsp
             ├── register.jsp
             ├── dashboard.jsp
             ├── chat.jsp
             ├── MentorMatching.jsp
+            ├── mentorDashboard.jsp
+            ├── admin.jsp
             └── studygroups.jsp
 ```
 
@@ -129,50 +137,120 @@ Ethiomentor/
 
 ## Features 🌟
 
-- Role-based authentication (Admin, Mentor, Mentee) 🔐
-- Real-time chat using WebSockets 💬
-- Mentor-mentee matching system 🤝
-- Study group creation and management 📚
-- Dashboard with activity overview 📊
-- Secure password handling and session management 🔒
+* Role-based authentication (Admin, Mentor, Mentee) 🔐
+* Real-time chat using WebSockets 💬
+* Mentor-mentee matching system 🤝
+* Study group creation and management 📚
+* Dashboard with activity overview 📊
+* Secure password handling and session management 🔒
 
 ---
 
 ## Technologies Used 🛠️
 
-- **Backend:** Java Servlets ☕, JSP 📄
-- **Frontend:** HTML 🌐, CSS 🎨, JavaScript ⚡
-- **Database:** PostgreSQL 🐘
-- **Server:** Apache Tomcat 9 🖥️
-- **Libraries:** JSON 📦, JSTL 📚
+* **Backend:** Java Servlets ☕, JSP 📄
+* **Frontend:** HTML 🌐, CSS 🎨, JavaScript ⚡
+* **Database:** PostgreSQL 🐘
+* **Server:** Apache Tomcat 9 🖥️
+* **Libraries:** JSON 📦, JSTL 📚
 
 ---
 
 ## Installation & Setup ⚙️
 
-1. **Clone the repository:**
+### Project Setup Guide (Eclipse + JDK 18 + Apache Tomcat)
+
+This project is a **Java Web Application** developed using **Eclipse IDE**, **JDK 18**, and **Apache Tomcat**. Follow the steps below **exactly** to ensure the project runs correctly.
+
+---
+
+### 1. Prerequisites
+
+Ensure the following are installed:
+
+* Java Development Kit (JDK) 18
+* Eclipse IDE for Enterprise Java and Web Developers
+* Apache Tomcat 9.0.x
+* Git
+
+---
+
+### 2. Install JDK 18
+
+Verify installation:
+
+```bash
+java --version
+```
+
+---
+
+### 3. Install Eclipse
+
+Download **Eclipse IDE for Enterprise Java and Web Developers** (not plain Java).
+
+---
+
+### 4. Configure Eclipse to Use JDK 18
+
+`Window → Preferences → Java → Installed JREs` → Add JDK 18 → Set as default.
+
+---
+
+### 5. Install and Configure Tomcat 10.1
+
+Add Tomcat 9.0.*  to Eclipse via the **Servers** view.
+
+---
+
+### 6. Clone the Project
 
 ```bash
 git clone https://github.com/BiraGirma/-EthioMentor.git
 ```
 
-2. **Configure database:**
+Import as an **Existing Eclipse Project**.
 
-   - Open `src/main/java/com/ethiomentor/config/DBConfig.java` and set your **port number, username, and password** for PostgreSQL.
-   - The database and tables will be **automatically initialized** when you run the app.
+---
 
-3. **Deploy on Tomcat 9:**
+### 7. Fix Project Configuration
 
-   - Copy the project to the `webapps` folder of your Tomcat 9 installation.
-   - Start the Tomcat server.
+* Enable **Project Facets** (Java 18, Dynamic Web Module 4.0)
+* Set **Target Runtime** to Tomcat 9.0.*
+* Ensure **Java Build Path** uses JDK 18
 
-4. **Access the application:**
+---
 
-   - Open a web browser and navigate to:
+### 8. Run the Project
 
-   ```
-   http://localhost:YOUR_PORT/index.jsp
-   ```
+Run the project on **Tomcat 9.0.* ** using **Run on Server**.
+
+---
+
+### 9. Common Mistakes
+
+* Using JRE instead of JDK
+* Using Tomcat 10/11
+* Missing Project Facets
+
+---
+
+### 10. Instructor Execution Steps
+
+1. Install JDK 18
+2. Install Eclipse Enterprise
+3. Install Tomcat 9.0
+4. Import project
+5. Fix facets if prompted
+6. Run on server
+
+---
+
+## 🔐 Admin Panel Screenshots
+
+| Admin Dashboard                                      | 
+| ---------------------------------------------------- | 
+| ![admin-dashboard](assets/admin/admin-dashboard.png) | 
 
 ---
 
@@ -186,17 +264,18 @@ git clone https://github.com/BiraGirma/-EthioMentor.git
 | ---------------------------------- | -------------------------------------------- | ------------------------------------ | ------------------------ |
 | ![dashboard](assets/dashboard.png) | ![mentormatching](assets/mentormatching.png) | ![studygroup](assets/studygroup.png) | ![chat](assets/chat.png) |
 
+
 ---
 
 ## Contributors 👥
 
 This project was developed as a **group project for educational purposes** by:
 
-- [Bira Girma](https://github.com/BiraGirma)
-- [Biniyam Lema](https://github.com/ben-on-tech)
-- [Hanif Esmail](https://github.com/hanifo)
-- [Kalkidan Birhane](https://github.com/pro-kal)
-- [Tewodros Mesfin](https://github.com/tedacodder)
+* [Bira Girma](https://github.com/BiraGirma)  UGR/34107/16
+* [Biniyam Lema](https://github.com/ben-on-tech) UGR/34018/16
+* [Hanif Esmail](https://github.com/hanifo) UGR/30629/15
+* [Kalkidan Birhane](https://github.com/pro-kal) UGR/34711/16
+* [Tewodros Mesfin](https://github.com/tedacodder) UGR/35497/16
 
 ---
 
