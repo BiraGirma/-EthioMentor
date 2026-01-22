@@ -107,6 +107,7 @@ public class ChatService {
     }
     
     public int getOrCreatePrivateConversation(int user1Id, int user2Id) throws Exception {
+<<<<<<< HEAD
         // check if a private conversation exists
         Integer existingId = conversationDAO.getPrivateConversationId(user1Id, user2Id);
         if (existingId != null) return existingId;
@@ -118,4 +119,31 @@ public class ChatService {
         return conv.getId();
     }
 
+=======
+
+        if (user1Id <= 0 || user2Id <= 0) {
+            throw new IllegalArgumentException(
+                "Invalid user IDs: user1Id=" + user1Id + ", user2Id=" + user2Id
+            );
+        }
+
+        if (user1Id == user2Id) {
+            throw new IllegalArgumentException("Cannot create conversation with self");
+        }
+
+        Integer existingId =
+            conversationDAO.getPrivateConversationId(user1Id, user2Id);
+
+        if (existingId != null) return existingId;
+
+        Conversation conv = conversationDAO.createConversation("PRIVATE");
+
+        conversationDAO.addParticipant(conv.getId(), user1Id);
+        conversationDAO.addParticipant(conv.getId(), user2Id);
+
+        return conv.getId();
+    }
+
+
+>>>>>>> 8fb5b46 (finilized)
 }

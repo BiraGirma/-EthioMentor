@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <header class="top-header">
+<<<<<<< HEAD
   <div class="top-left">
     <h2 class="page-title">Dashboard</h2>
   </div>
@@ -14,4 +15,22 @@
   function toggleSidebar() {
     document.querySelector(".sidebar").classList.toggle("collapsed");
   }
+=======
+    <div class="top-left">
+        
+        <h2 class="page-title">Dashboard</h2>
+    </div>
+
+    <div class="top-right">
+        <span class="user-name">
+            👤 ${user.getFullName()}
+        </span>
+    </div>
+</header>
+
+<script>
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('collapsed');
+}
+>>>>>>> 8fb5b46 (finilized)
 </script>

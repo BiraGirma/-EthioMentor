@@ -13,6 +13,17 @@ public class RegisterServlet extends HttpServlet {
     private final UserService userService = new UserService();
 
     @Override
+<<<<<<< HEAD
+=======
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        // show registration page
+        req.getRequestDispatcher("/register.jsp").forward(req, resp);
+    }
+
+    @Override
+>>>>>>> 8fb5b46 (finilized)
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -35,11 +46,21 @@ public class RegisterServlet extends HttpServlet {
 
         if (success) {
             HttpSession session = req.getSession();
+<<<<<<< HEAD
             session.setAttribute("user", user); // ✅ FIX
             resp.sendRedirect(req.getContextPath() + "/dashboard");
         } else {
             req.setAttribute("error", "Registration failed.");
             req.getRequestDispatcher("register.jsp").forward(req, resp);
+=======
+            session.setAttribute("user", user);
+            session.setAttribute("userId", user.getId());
+            session.setAttribute("role", user.getRole());
+            resp.sendRedirect(req.getContextPath() + "/dashboard");
+        } else {
+            req.setAttribute("error", "Registration failed.");
+            req.getRequestDispatcher("/register.jsp").forward(req, resp);
+>>>>>>> 8fb5b46 (finilized)
         }
     }
 }

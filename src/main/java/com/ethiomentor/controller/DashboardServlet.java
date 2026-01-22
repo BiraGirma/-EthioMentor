@@ -1,7 +1,11 @@
 package com.ethiomentor.controller;
 
+<<<<<<< HEAD
 import com.ethiomentor.util.DBConnection;
 
+=======
+import com.ethiomentor.config.DBConfig;
+>>>>>>> 8fb5b46 (finilized)
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;

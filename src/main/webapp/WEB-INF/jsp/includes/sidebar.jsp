@@ -1,6 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<<<<<<< HEAD
+=======
+<c:set var="userRole" value="${sessionScope.role}" />
+
+>>>>>>> 8fb5b46 (finilized)
 <aside class="sidebar" id="sidebar">
 
     <!-- LOGO + COLLAPSE -->
@@ -8,14 +13,19 @@
         <span class="logo-mark">🇪🇹</span>
         <span class="logo-text">EthioMentor</span>
 
+<<<<<<< HEAD
         <!-- Collapse button -->
         <button class="collapse-btn" id="collapseBtn" title="Toggle sidebar">
             ☰
         </button>
+=======
+        <button class="collapse-btn" id="collapseBtn" title="Toggle sidebar">☰</button>
+>>>>>>> 8fb5b46 (finilized)
     </div>
 
     <!-- NAVIGATION -->
     <nav class="sidebar-nav">
+<<<<<<< HEAD
 
         <a href="dashboard" class="nav-item active">
             <span class="icon">📊</span>
@@ -56,26 +66,72 @@
             </a>
         </c:if>
 
+=======
+        <c:choose>
+            <c:when test="${userRole eq 'mentor'}">
+                <a href="mentor-dashboard" class="nav-item">📊 Dashboard</a>
+                <a href="studygroups.jsp" class="nav-item">👥 Study Groups</a>
+                <a href="chat.jsp" class="nav-item">✉️ Messages</a>
+            </c:when>
+
+            <c:when test="${userRole eq 'admin'}">
+                <a href="admin" class="nav-item">🛡️ Admin</a>
+                <a href="studygroups.jsp" class="nav-item">👥 Study Groups</a>
+                <a href="chat.jsp" class="nav-item">✉️ Messages</a>
+            </c:when>
+
+            <c:otherwise>
+                <a href="dashboard" class="nav-item">📊 Dashboard</a>
+                <a href="studygroups.jsp" class="nav-item">👥 Study Groups</a>
+                <a href="MentorMatching.jsp" class="nav-item">🤝 Mentor Matching</a>
+                <a href="chat.jsp" class="nav-item">✉️ Messages</a>
+            </c:otherwise>
+        </c:choose>
+>>>>>>> 8fb5b46 (finilized)
     </nav>
 
     <!-- FOOTER -->
     <div class="sidebar-footer">
+<<<<<<< HEAD
         <a href="${pageContext.request.contextPath}/logout" class="logout-btn">
             <span class="icon">🚪</span>
             <span>Logout</span>
         </a>
+=======
+        <a href="${pageContext.request.contextPath}/logout" class="logout-btn">🚪 Logout</a>
+>>>>>>> 8fb5b46 (finilized)
     </div>
 
 </aside>
 
+<<<<<<< HEAD
 <!-- COLLAPSE SCRIPT -->
 <script>
+=======
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+>>>>>>> 8fb5b46 (finilized)
     const sidebar = document.getElementById("sidebar");
     const collapseBtn = document.getElementById("collapseBtn");
     const mainContent = document.querySelector(".main-content");
 
+<<<<<<< HEAD
     collapseBtn.addEventListener("click", () => {
         sidebar.classList.toggle("collapsed");
         mainContent.classList.toggle("collapsed");
     });
+=======
+    const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+        if (mainContent) mainContent.classList.add('collapsed');
+    }
+
+    collapseBtn.addEventListener("click", () => {
+        sidebar.classList.toggle('collapsed');
+        if (mainContent) mainContent.classList.toggle('collapsed');
+        localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
+    });
+});
+>>>>>>> 8fb5b46 (finilized)
 </script>

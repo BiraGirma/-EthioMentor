@@ -1,4 +1,5 @@
 /* ==========================
+<<<<<<< HEAD
    GLOBAL RESET & BASE
 ========================== */
 
@@ -168,11 +169,40 @@ a {
   font-size: 14px;
   font-weight: 800;
 }
+=======
+   HERO SECTION
+========================== */
+.hero {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #2C1810 0%, #D4AF37 100%);
+    color: white;
+    border-radius: 2rem;
+    border-bottom: 8px solid #D4AF37;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.hero-pattern {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20L40 40H0L20 20z' fill='%23D4AF37'/%3E%3C/svg%3E");
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.hero-left { max-width: 600px; position: relative; z-index: 10; }
+.tibeb-badge { background: #D4AF37; color: #2C1810; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-weight: 900; }
+>>>>>>> 8fb5b46 (finilized)
 
 /* ==========================
    DASHBOARD GRID
 ========================== */
 .dashboard-grid {
+<<<<<<< HEAD
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 32px;
@@ -391,4 +421,79 @@ body {
 .main-content {
   grid-column: 2;
   padding: 32px;
+=======
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+/* LEFT SIDE */
+.dashboard-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.mini-stats { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+.mini-card {
+    flex: 1;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 2rem;
+    border: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mini-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+.chart-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 2.5rem;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+}
+
+.chart-card h3 { font-size: 1.25rem; font-weight: 900; margin-bottom: 1.5rem; color: #2C1810; }
+
+/* RIGHT SIDEBAR */
+.dashboard-side {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.vibes-card, .mentor-card {
+    border-radius: 2.5rem;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.vibes-card { background: #FAF9F6; border: 1px solid #e5e5e5; }
+.vibes-card .badge { background: #D4AF37; color: white; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-size: 0.6rem; }
+
+.vibe { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.vibe span { font-size: 1.2rem; }
+
+.mentor-card { background: #2C1810; color: white; border-top: 8px solid #D4AF37; }
+.mentor-info { display: flex; gap: 1rem; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1rem; border: 1px solid rgba(255,255,255,0.1); }
+.mentor-info img { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #D4AF37; }
+
+.connect-btn { width: 100%; padding: 0.75rem; background: #D4AF37; color: #2C1810; font-weight: bold; border-radius: 1rem; cursor: pointer; }
+.connect-btn:hover { transform: scale(1.05); box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+
+/* ==========================
+   RESPONSIVE
+========================== */
+@media (max-width: 1024px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .hero { flex-direction: column; gap: 16px; }
+    .mini-stats { flex-direction: column; }
+>>>>>>> 8fb5b46 (finilized)
 }
