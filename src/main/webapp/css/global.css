@@ -1,8 +1,16 @@
 /* ==========================
    GLOBAL RESET & BASE
 ========================== */
+<<<<<<< HEAD
 
 
+=======
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 * {
     margin: 0;
     padding: 0;
@@ -345,6 +353,11 @@ html {
     scroll-behavior: smooth;
 }
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 /* ==============================
    GLOBAL LAYOUT FIX (SIDEBAR + MAIN)
    ============================== */
@@ -395,3 +408,7 @@ html, body {
     padding: 32px;
 }
 
+<<<<<<< HEAD
+=======
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627

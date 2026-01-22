@@ -107,6 +107,22 @@ public class ChatService {
     }
     
     public int getOrCreatePrivateConversation(int user1Id, int user2Id) throws Exception {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+        // check if a private conversation exists
+        Integer existingId = conversationDAO.getPrivateConversationId(user1Id, user2Id);
+        if (existingId != null) return existingId;
+
+        // create new conversation
+        Conversation conv = conversationDAO.createConversation("PRIVATE");
+        conversationDAO.addParticipant(conv.getId(), user1Id);
+        conversationDAO.addParticipant(conv.getId(), user2Id);
+        return conv.getId();
+    }
+
+=======
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 
         if (user1Id <= 0 || user2Id <= 0) {
             throw new IllegalArgumentException(
@@ -132,4 +148,8 @@ public class ChatService {
     }
 
 
+<<<<<<< HEAD
+=======
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 }

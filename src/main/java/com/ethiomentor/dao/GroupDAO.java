@@ -1,3 +1,35 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+package com.ethiomentor.dao;
+
+import com.ethiomentor.config.DBConfig;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+public class GroupDAO {
+
+    public void createGroup(String name, String description, int creatorId)
+            throws Exception {
+
+        String sql = """
+            INSERT INTO study_groups (name, description, created_by)
+            VALUES (?, ?, ?)
+        """;
+
+        try (Connection con = DBConfig.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setString(2, description);
+            ps.setInt(3, creatorId);
+            ps.executeUpdate();
+        }
+    }
+}
+=======
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 package com.ethiomentor.dao;
 
 import com.ethiomentor.config.DBConfig;
@@ -43,3 +75,7 @@ public class GroupDAO {
         }
     }
 }
+<<<<<<< HEAD
+=======
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627

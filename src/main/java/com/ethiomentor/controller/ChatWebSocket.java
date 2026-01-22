@@ -75,11 +75,31 @@ public class ChatWebSocket {
         System.out.println("WebSocket connected: userId=" + userId);
     }
 
+<<<<<<< HEAD
   
+=======
+<<<<<<< HEAD
+=======
+  
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
     @OnMessage
     public void onMessage(Session session, String jsonMessage) throws Exception {
 
         try {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+            // Parse incoming JSON
+            JSONObject obj = new JSONObject(jsonMessage);
+
+            ChatMessage msg = new ChatMessage();
+            msg.setConversationId(obj.getInt("conversationId"));
+            msg.setSenderId(userId);
+            msg.setContent(obj.getString("content"));
+            msg.setType("TEXT");
+=======
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
             JSONObject obj = new JSONObject(jsonMessage);
 
             int conversationId = obj.getInt("conversationId");
@@ -92,18 +112,38 @@ public class ChatWebSocket {
             msg.setContent(content);
             msg.setType("TEXT");
             msg.setRecipientId(recipientId); // now correctly set
+<<<<<<< HEAD
+=======
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 
             // Save message
             ChatMessage saved = chatService.sendMessage(msg);
 
             // Broadcast to all participants
+<<<<<<< HEAD
             List<Integer> participants = chatService.getParticipants(saved.getConversationId());
+=======
+<<<<<<< HEAD
+            List<Integer> participants =
+                    chatService.getParticipants(saved.getConversationId());
+=======
+            List<Integer> participants = chatService.getParticipants(saved.getConversationId());
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 
             JSONObject response = new JSONObject();
             response.put("id", saved.getId());
             response.put("conversationId", saved.getConversationId());
             response.put("senderId", saved.getSenderId());
+<<<<<<< HEAD
             response.put("recipientId", saved.getRecipientId());
+=======
+<<<<<<< HEAD
+=======
+            response.put("recipientId", saved.getRecipientId());
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
             response.put("content", saved.getContent());
             response.put("timestamp", saved.getTimestamp().toString());
 
@@ -114,15 +154,36 @@ public class ChatWebSocket {
                 }
             }
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+            try {
+                session.getBasicRemote()
+                        .sendText("{\"error\":\"Message failed\"}");
+=======
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
         } catch (Exception e) {
             e.printStackTrace();
             try {
                 session.getBasicRemote().sendText("{\"error\":\"Message failed\"}");
+<<<<<<< HEAD
+=======
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
             } catch (IOException ignored) {}
         }
     }
 
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
     @OnClose
     public void onClose(Session session, CloseReason reason) {
         activeUsers.remove(userId);

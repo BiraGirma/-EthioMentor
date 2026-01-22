@@ -39,10 +39,19 @@ public class StudyGroupServlet extends HttpServlet {
         req.setAttribute("randomGroups", randomGroups);
         req.setAttribute("joinedGroups", joinedGroups);
         req.setAttribute("createdGroups", createdGroups);
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
         System.out.println("All groups: " + allGroups.size());
         System.out.println("Random groups: " + randomGroups.size());
         System.out.println("Joined groups: " + joinedGroups.size());
         System.out.println("Created groups: " + createdGroups.size());
+<<<<<<< HEAD
+=======
+>>>>>>> 8fb5b46 (finilized)
+>>>>>>> 2bdd21ccaf16834af801aaad4a078e24691fa627
 
         req.getRequestDispatcher("/WEB-INF/jsp/studygroups.jsp").forward(req, resp);
     }
