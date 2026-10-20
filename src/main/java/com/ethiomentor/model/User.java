@@ -5,12 +5,13 @@ public class User {
     private String username;
     private String fullName;
     private String email;
-    private String password;       // plain text for now; ideally hashed
+    private String password;       // password hash (null in sessions)
     private String role;           // e.g., student, mentor, admin
     private String university;
     
     // Optional / new fields
-    private String mentorStatus;   // e.g., pending, approved
+    private String mentorStatus;   // PENDING, APPROVED or REJECTED (mentors only)
+    private boolean active = true; // false = deactivated by an admin
 
     // Constructors
     public User() {}
@@ -42,6 +43,9 @@ public class User {
 
     public String getUniversity() { return university; }
     public void setUniversity(String university) { this.university = university; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 
     public String getMentorStatus() { return mentorStatus; }
     public void setMentorStatus(String mentorStatus) { this.mentorStatus = mentorStatus; }

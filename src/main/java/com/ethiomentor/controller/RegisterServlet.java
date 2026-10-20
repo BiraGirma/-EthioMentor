@@ -2,6 +2,8 @@ package com.ethiomentor.controller;
 
 import com.ethiomentor.model.User;
 import com.ethiomentor.service.UserService;
+import com.ethiomentor.util.InputUtil;
+import com.ethiomentor.util.SessionUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,8 +18,6 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-        // Show registration page
         req.getRequestDispatcher("/register.jsp").forward(req, resp);
     }
 
@@ -25,32 +25,22 @@ public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String username = req.getParameter("username").trim();
-        String fullName = req.getParameter("fullName").trim();
-        String email = req.getParameter("email").trim();
-        String password = req.getParameter("password");
-        String role = req.getParameter("role");
-        String uni = req.getParameter("uni").trim();
-
         User user = new User();
-        user.setUsername(username);
-        user.setFullName(fullName);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setRole(role);
-        user.setUniversity(uni);
+        user.setUsername(InputUtil.trim(req.getParameter("username")));
+        user.setFullName(InputUtil.trim(req.getParameter("fullName")));
+        user.setEmail(InputUtil.trim(req.getParameter("email")));
+        user.setPassword(req.getParameter("password"));      // plaintext; hashed in the service
+        user.setRole(req.getParameter("role"));
+        user.setUniversity(InputUtil.trim(req.getParameter("uni")));
 
-        boolean success = userService.registerUser(user);
+        String error = userService.registerUser(user, req.getParameter("expertise"));
 
-        if (success) {
-            HttpSession session = req.getSession();
-            session.setAttribute("user", user);
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("role", user.getRole());
-
-            resp.sendRedirect(req.getContextPath() + "/dashboard");
+        if (error == null) {
+            SessionUtil.login(req, user);
+            resp.sendRedirect(req.getContextPath() + SessionUtil.homeFor(user));
         } else {
-            req.setAttribute("error", "Registration failed.");
+            req.setAttribute("error", error);
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             req.getRequestDispatcher("/register.jsp").forward(req, resp);
         }
     }

@@ -1,6 +1,5 @@
 package com.ethiomentor.controller;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
@@ -9,21 +8,16 @@ import java.io.IOException;
 public class LogoutServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        HttpSession session = req.getSession(false); // get session if exists
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HttpSession session = req.getSession(false);
         if (session != null) {
-            session.invalidate(); // destroy session
+            session.invalidate();
         }
-
-        // Redirect to login page after logout
         resp.sendRedirect(req.getContextPath() + "/login.jsp");
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        doGet(req, resp); // handle POST the same way
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        doGet(req, resp);
     }
 }

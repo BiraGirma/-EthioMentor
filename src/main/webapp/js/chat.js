@@ -2,7 +2,7 @@ let socket;
 const renderedMessageIds = new Set(); // track already rendered messages
 
 function renderMessage(msg) {
-    if (renderedMessageIds.has(msg.id)) return; // skip duplicates
+    if (renderedMessageIds.has(msg.id)) return; // skip duplicates (history vs. live)
     renderedMessageIds.add(msg.id);
 
     const container = document.getElementById("chatMessages");
@@ -18,28 +18,40 @@ function renderMessage(msg) {
     container.scrollTop = container.scrollHeight;
 }
 
+function showNotice(text) {
+    const container = document.getElementById("chatMessages");
+    const note = document.createElement("div");
+    note.className = "chat-notice";
+    note.textContent = text;
+    container.appendChild(note);
+    container.scrollTop = container.scrollHeight;
+}
+
 function loadHistory() {
     fetch(CONTEXT_PATH + "/loadMessages?conversationId=" + CONVERSATION_ID)
-        .then(res => res.json())
-        .then(data => {
-            data.forEach(msg => {
-                renderMessage(msg); // will skip duplicates automatically
-            });
+        .then(res => {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
         })
-        .catch(err => console.error("Failed to load chat history", err));
+        .then(data => data.forEach(renderMessage))
+        .catch(err => {
+            console.error("Failed to load chat history", err);
+            showNotice("Could not load earlier messages.");
+        });
 }
 
 function connect() {
-    socket = new WebSocket("ws://" + window.location.host + CONTEXT_PATH + "/ws/chat");
-
-    socket.onopen = () => console.log("✅ WebSocket connected");
+    const scheme = window.location.protocol === "https:" ? "wss://" : "ws://";
+    socket = new WebSocket(scheme + window.location.host + CONTEXT_PATH + "/ws/chat");
 
     socket.onmessage = (event) => {
         const msg = JSON.parse(event.data);
-        renderMessage(msg); // will not duplicate messages
+        if (msg.error) { showNotice(msg.error); return; }
+        // The socket delivers messages for all of the user's conversations; show only this one.
+        if (msg.conversationId === CONVERSATION_ID) renderMessage(msg);
     };
 
-    socket.onclose = () => console.log("❌ WebSocket disconnected");
+    socket.onclose = () => showNotice("Disconnected. Reload the page to reconnect.");
 }
 
 function sendMessage() {
@@ -47,29 +59,27 @@ function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
 
-    const tempId = "temp-" + Date.now();
-    renderMessage({
-        id: tempId,
-        senderId: USER_ID,
-        content: text,
-        timestamp: new Date().toISOString()
-    });
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+        showNotice("Not connected. Reload the page and try again.");
+        return;
+    }
 
-    const payload = {
-        conversationId: CONVERSATION_ID,
-        content: text,
-        tempId: tempId // send tempId to server
-    };
-
-    socket.send(JSON.stringify(payload));
-
+    // The server echoes the saved message back to the sender, so it is rendered once, on receipt.
+    socket.send(JSON.stringify({ conversationId: CONVERSATION_ID, content: text }));
     input.value = "";
 }
 
+// Enter and the Send button both submit the form, so sending has one code path.
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("chatForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        sendMessage();
+    });
+});
 
 // helpers
 function escapeHtml(text) {
-    return text.replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+    return String(text).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
 }
 
 function formatTime(ts) {

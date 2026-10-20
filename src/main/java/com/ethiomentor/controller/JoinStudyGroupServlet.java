@@ -2,6 +2,10 @@ package com.ethiomentor.controller;
 
 import com.ethiomentor.dao.StudyGroupDAO;
 import com.ethiomentor.model.User;
+import com.ethiomentor.util.InputUtil;
+import com.ethiomentor.util.JsonUtil;
+import com.ethiomentor.util.SessionUtil;
+import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -14,27 +18,27 @@ public class JoinStudyGroupServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        User user = SessionUtil.currentUser(req);
+        if (user == null) {
+            JsonUtil.error(resp, 401, "Not logged in");
+            return;
+        }
 
-        resp.setContentType("application/json");
+        int groupId = InputUtil.parseId(req.getParameter("groupId"));
+        if (groupId < 0) {
+            JsonUtil.error(resp, 400, "Invalid groupId");
+            return;
+        }
 
         try {
-            User user = (User) req.getSession().getAttribute("user");
-            if (user == null) {
-                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                resp.getWriter().write("{\"error\":\"User not logged in\"}");
+            if (!dao.joinGroup(groupId, user.getId())) {
+                JsonUtil.error(resp, 404, "Group not found");
                 return;
             }
-
-            int groupId = Integer.parseInt(req.getParameter("groupId"));
-            dao.joinGroup(groupId, user.getId());
-
-            int count = dao.getMembersCount(groupId);
-            resp.getWriter().write("{\"membersCount\":" + count + "}");
-
+            JsonUtil.send(resp, 200, new JSONObject().put("membersCount", dao.getMembersCount(groupId)));
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("{\"membersCount\":0}");
             e.printStackTrace();
+            JsonUtil.error(resp, 500, "Could not join group");
         }
     }
 }

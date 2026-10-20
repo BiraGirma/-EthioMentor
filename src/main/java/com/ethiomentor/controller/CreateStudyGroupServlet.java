@@ -2,6 +2,10 @@ package com.ethiomentor.controller;
 
 import com.ethiomentor.dao.StudyGroupDAO;
 import com.ethiomentor.model.User;
+import com.ethiomentor.util.InputUtil;
+import com.ethiomentor.util.JsonUtil;
+import com.ethiomentor.util.SessionUtil;
+import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -14,26 +18,28 @@ public class CreateStudyGroupServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("application/json");
+        User user = SessionUtil.currentUser(req);
+        if (user == null) {
+            JsonUtil.send(resp, 401, new JSONObject().put("success", false).put("error", "Not logged in"));
+            return;
+        }
+
+        String name = InputUtil.trim(req.getParameter("name"));
+        String description = InputUtil.trim(req.getParameter("description"));
+        if (description == null) description = "";
+
+        if (!InputUtil.lengthBetween(name, 1, 100) || description.length() > 1000) {
+            JsonUtil.send(resp, 400, new JSONObject().put("success", false)
+                    .put("error", "Name is required (max 100 characters); description max 1000."));
+            return;
+        }
 
         try {
-            User user = (User) req.getSession().getAttribute("user");
-            if (user == null) {
-                resp.setStatus(401);
-                resp.getWriter().write("{\"success\":false,\"error\":\"User not logged in\"}");
-                return;
-            }
-
-            String name = req.getParameter("name");
-            String description = req.getParameter("description");
-
-            dao.createGroup(name, description, user.getId());
-
-            resp.getWriter().write("{\"success\":true}");
+            int id = dao.createGroup(name, description, user.getId());
+            JsonUtil.send(resp, 201, new JSONObject().put("success", true).put("id", id));
         } catch (Exception e) {
-            resp.setStatus(500);
-            resp.getWriter().write("{\"success\":false}");
             e.printStackTrace();
+            JsonUtil.send(resp, 500, new JSONObject().put("success", false).put("error", "Could not create group"));
         }
     }
 }

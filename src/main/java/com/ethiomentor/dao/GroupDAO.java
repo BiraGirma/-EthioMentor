@@ -42,35 +42,15 @@ public class GroupDAO {
     }
 
     /**
-     * Create a new study group.
-     *
-     * @param name        the group name
-     * @param description the group description
-     * @param creatorId   the user ID of the mentor creating the group
-     * @throws Exception in case of DB errors
-     */
-    public void createGroup(String name, String description, int creatorId) throws Exception {
-        String sql = "INSERT INTO study_groups (name, description, created_by) VALUES (?, ?, ?)";
-
-        try (Connection conn = DBConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, name);
-            ps.setString(2, description);
-            ps.setInt(3, creatorId);
-
-            ps.executeUpdate();
-        }
-    }
-
-    /**
      * Fetch full study group details (optional extra utility method).
      *
      * @return list of StudyGroup objects
      */
     public List<StudyGroup> getAllGroups() {
         List<StudyGroup> groups = new ArrayList<>();
-        String sql = "SELECT id, name, description, members_count, created_by FROM study_groups ORDER BY id ASC";
+        String sql = "SELECT sg.id, sg.name, sg.description, sg.created_by, " +
+                     "(SELECT COUNT(*) FROM study_group_members m WHERE m.group_id = sg.id) AS members_count " +
+                     "FROM study_groups sg ORDER BY sg.id ASC";
 
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);

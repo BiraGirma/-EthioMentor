@@ -5,8 +5,12 @@
 <html>
 <head>
     <title>EthioMentor | Study Groups</title>
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/studygroups.css">
+    <meta name="csrf-token" content="${sessionScope.csrfToken}">
+    <meta name="ctx" content="${pageContext.request.contextPath}">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/studygroups.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <script defer src="/js/shell.js"></script>
 </head>
 <body>
 
@@ -35,8 +39,8 @@
                                     <span class="subject">STUDY</span>
                                     <span class="members-count">${g.membersCount} members</span>
                                 </div>
-                                <h3>${g.name}</h3>
-                                <p>${g.description}</p>
+                                <h3><c:out value="${g.name}"/></h3>
+                                <p><c:out value="${g.description}"/></p>
                                 <c:choose>
                                     <c:when test="${g.member}">
                                         <button class="btn disabled" disabled>Already Member</button>
@@ -67,8 +71,8 @@
                                     <span class="subject">STUDY</span>
                                     <span class="members-count">${g.membersCount} members</span>
                                 </div>
-                                <h3>${g.name}</h3>
-                                <p>${g.description}</p>
+                                <h3><c:out value="${g.name}"/></h3>
+                                <p><c:out value="${g.description}"/></p>
                                 <button class="btn disabled" disabled>Already Member</button>
                             </div>
                         </c:forEach>
@@ -92,8 +96,8 @@
                                     <span class="subject">STUDY</span>
                                     <span class="members-count">${g.membersCount} members</span>
                                 </div>
-                                <h3>${g.name}</h3>
-                                <p>${g.description}</p>
+                                <h3><c:out value="${g.name}"/></h3>
+                                <p><c:out value="${g.description}"/></p>
                                 <c:choose>
                                     <c:when test="${g.member}">
                                         <button class="btn disabled" disabled>Already Member</button>
@@ -130,11 +134,11 @@
         <form id="createGroupForm" class="modal-form">
             <div class="form-group">
                 <label>Group Name</label>
-                <input type="text" name="name" placeholder="e.g. Java Backend Masters" required>
+                <input type="text" name="name" placeholder="e.g. Java Backend Masters" maxlength="100" required>
             </div>
             <div class="form-group">
                 <label>Description</label>
-                <textarea name="description" rows="4" placeholder="What will this group focus on?" required></textarea>
+                <textarea name="description" rows="4" placeholder="What will this group focus on?" maxlength="1000" required></textarea>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn ghost" onclick="closeModal()">Cancel</button>
@@ -144,6 +148,6 @@
     </div>
 </div>
 
-<script src="js/studygroups.js"></script>
+<script src="${pageContext.request.contextPath}/js/studygroups.js"></script>
 </body>
 </html>

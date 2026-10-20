@@ -7,12 +7,12 @@
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sidebar.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <script defer src="/js/shell.js"></script>
 </head>
 <body>
 
-<div class="app-layout d-flex">
+<div class="app-layout">
 
     <!-- SIDEBAR -->
     <jsp:include page="WEB-INF/jsp/includes/sidebar.jsp"/>
@@ -50,7 +50,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Name</th><th>Username</th><th>Role</th><th>University</th><th>Action</th>
+                        <th>Name</th><th>Username</th><th>Role</th><th>University</th><th>Status</th><th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,7 +63,20 @@
                                     <td><c:out value="${u.role}" /></td>
                                     <td><c:out value="${u.university}" /></td>
                                     <td>
-                                        <form method="post">
+                                        <c:choose>
+                                            <c:when test="${u.active}"><span class="badge bg-success">Active</span></c:when>
+                                            <c:otherwise><span class="badge bg-secondary">Deactivated</span></c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <form method="post" style="display:inline">
+                                            <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">
+                                            <input type="hidden" name="action" value="${u.active ? 'deactivateUser' : 'activateUser'}">
+                                            <input type="hidden" name="id" value="${u.id}">
+                                            <button class="btn btn-outline-secondary btn-sm">${u.active ? 'Deactivate' : 'Activate'}</button>
+                                        </form>
+                                        <form method="post" style="display:inline" onsubmit="return confirm('Delete this user and all their messages? This cannot be undone.');">
+                                            <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">
                                             <input type="hidden" name="action" value="deleteUser">
                                             <input type="hidden" name="id" value="${u.id}">
                                             <button class="btn btn-danger btn-sm">Delete</button>
@@ -73,7 +86,7 @@
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <tr><td colspan="5">No users found.</td></tr>
+                            <tr><td colspan="6">No users found.</td></tr>
                         </c:otherwise>
                     </c:choose>
                 </tbody>
@@ -97,11 +110,13 @@
                                     <td><c:out value="${m.university}" /></td>
                                     <td>
                                         <form method="post" style="display:inline">
+                                            <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">
                                             <input type="hidden" name="action" value="approveMentor">
                                             <input type="hidden" name="id" value="${m.id}">
                                             <button class="btn btn-success btn-sm">Approve</button>
                                         </form>
                                         <form method="post" style="display:inline">
+                                            <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">
                                             <input type="hidden" name="action" value="rejectMentor">
                                             <input type="hidden" name="id" value="${m.id}">
                                             <button class="btn btn-warning btn-sm">Reject</button>
@@ -134,7 +149,8 @@
                                     <td><c:out value="${g.description}" /></td>
                                     <td><c:out value="${g.membersCount}" /></td>
                                     <td>
-                                        <form method="post">
+                                        <form method="post" onsubmit="return confirm('Delete this study group?');">
+                                            <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">
                                             <input type="hidden" name="action" value="deleteGroup">
                                             <input type="hidden" name="id" value="${g.id}">
                                             <button class="btn btn-danger btn-sm">Delete</button>
@@ -151,50 +167,16 @@
             </table>
         </div>
 
-        <!-- ADMIN CHAT -->
+        <!-- MESSAGES -->
         <div class="card mb-4 p-3">
-            <h3>Admin Chat</h3>
-            <div id="chatWindow" class="border p-2 mb-2" style="height:300px; overflow-y:scroll; background:#f8f9fa;">
-                <!-- Messages will appear here -->
-            </div>
-            <form id="adminChatForm">
-                <div class="input-group">
-                    <input type="text" id="chatMessage" class="form-control" placeholder="Type a message...">
-                    <button class="btn btn-primary" type="submit">Send</button>
-                </div>
-            </form>
+            <h3>Messages</h3>
+            <p class="mb-2">Chat with any user from the Messages page.</p>
+            <div><a class="btn btn-primary" href="${pageContext.request.contextPath}/chat.jsp">Open Messages</a></div>
         </div>
 
     </div> <!-- END MAIN CONTENT -->
 </div> <!-- END APP LAYOUT -->
 
-<script>
-const ws = new WebSocket("ws://<%=request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/ws/chat");
-const chatWindow = document.getElementById("chatWindow");
-const chatForm = document.getElementById("adminChatForm");
-const chatInput = document.getElementById("chatMessage");
-
-ws.onopen = () => console.log("Admin chat connected");
-ws.onmessage = (event) => {
-    const msg = JSON.parse(event.data);
-    const p = document.createElement("p");
-    p.innerHTML = `<strong>${msg.sender}:</strong> ${msg.content}`;
-    chatWindow.appendChild(p);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-};
-
-chatForm.addEventListener("submit", function(e) {
-    e.preventDefault();
-    const message = chatInput.value.trim();
-    if(message) {
-        ws.send(JSON.stringify({
-            sender: "${sessionScope.user.username}",
-            content: message
-        }));
-        chatInput.value = "";
-    }
-});
-</script>
 
 </body>
 </html>
