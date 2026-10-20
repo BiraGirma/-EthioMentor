@@ -28,7 +28,7 @@ public class AdminDAO {
                     u.setRole(rs.getString("role"));
                     u.setUniversity(rs.getString("university"));
                     u.setMentorStatus(rs.getString("mentor_status"));
-                    
+                    u.setActive(rs.getBoolean("is_active"));
                     users.add(u);
                 }
             }
@@ -36,12 +36,24 @@ public class AdminDAO {
         return users;
     }
 
+    /**
+     * Deletes a user. Study groups they created are kept (created_by becomes NULL)
+     * because that foreign key has no ON DELETE rule; everything else cascades.
+     */
     public void deleteUser(int userId) throws Exception {
-        String sql = "DELETE FROM users WHERE id=?";
-        try (Connection conn = DBConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ps.executeUpdate();
+        try (Connection conn = DBConfig.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement orphan = conn.prepareStatement("UPDATE study_groups SET created_by = NULL WHERE created_by = ?");
+                 PreparedStatement del = conn.prepareStatement("DELETE FROM users WHERE id = ?")) {
+                orphan.setInt(1, userId);
+                orphan.executeUpdate();
+                del.setInt(1, userId);
+                del.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
         }
     }
 
@@ -77,7 +89,7 @@ public class AdminDAO {
     }
 
     public void updateMentorStatus(int userId, String status) throws Exception {
-        String sql = "UPDATE users SET mentor_status=? WHERE id=?";
+        String sql = "UPDATE users SET mentor_status=? WHERE id=? AND role='mentor'";
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
@@ -89,7 +101,9 @@ public class AdminDAO {
     /* ===== STUDY GROUPS ===== */
     public List<StudyGroup> getAllGroups() throws Exception {
         List<StudyGroup> groups = new ArrayList<>();
-        String sql = "SELECT id, name, description, members_count FROM study_groups ORDER BY id ASC";
+        String sql = "SELECT sg.id, sg.name, sg.description, " +
+                     "(SELECT COUNT(*) FROM study_group_members m WHERE m.group_id = sg.id) AS members_count " +
+                     "FROM study_groups sg ORDER BY sg.id ASC";
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {

@@ -8,24 +8,19 @@ public class AuthService {
     private final UserDAO userDAO = new UserDAO();
 
     /**
-     * Login using email or username as identifier
-     * @param identifier email or username
-     * @param password plaintext password
-     * @return User object if authentication successful, null otherwise
+     * Login using email or username as identifier.
+     * @return the user (without password hash) if authentication succeeded, null otherwise
      */
     public User login(String identifier, String password) {
         return userDAO.authenticate(identifier, password);
     }
 
     /**
-     * Optional: Login with role restriction
-     * @param email user's email
-     * @param password plaintext password
-     * @param role expected role (e.g., "student", "mentor", "admin")
-     * @return User object if authentication successful and role matches, null otherwise
+     * Login that additionally requires the account to have the given role.
+     * @return the user if authentication succeeded and the role matches, null otherwise
      */
-    public User login(String email, String password, String role) {
-        User user = userDAO.authenticate(email, password);
+    public User login(String identifier, String password, String role) {
+        User user = userDAO.authenticate(identifier, password);
         if (user != null && user.getRole().equalsIgnoreCase(role)) {
             return user;
         }

@@ -106,6 +106,10 @@ public class ChatService {
         return userDAO.getAllOtherUsers(currentUserId); // implement in DAO
     }
 
+    public boolean isParticipant(int conversationId, int userId) throws Exception {
+        return conversationDAO.isParticipant(conversationId, userId);
+    }
+
     public int getOrCreatePrivateConversation(int user1Id, int user2Id) throws Exception {
         if (user1Id <= 0 || user2Id <= 0) {
             throw new IllegalArgumentException(

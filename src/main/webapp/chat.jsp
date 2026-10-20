@@ -1,44 +1,44 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.ethiomentor.model.User" %>
-<%@ page import="com.ethiomentor.model.ChatMessage" %>
 <%@ page import="com.ethiomentor.service.ChatService" %>
+<%@ page import="com.ethiomentor.util.InputUtil" %>
+<%@ page import="com.ethiomentor.util.SessionUtil" %>
 
 <%
-    Integer userId = (Integer) session.getAttribute("userId");
-    if (userId == null) {
-        response.sendRedirect("login.jsp");
+    User me = SessionUtil.currentUser(request);
+    if (me == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
+    int userId = me.getId();
+    String CONTEXT_PATH = request.getContextPath();
 
     ChatService chatService = new ChatService();
-
     List<User> potentialUsers = chatService.getPotentialChatUsers(userId);
 
-    String selectedUserIdParam = request.getParameter("userId");
-    int selectedUserId;
-
-    if (selectedUserIdParam != null && !selectedUserIdParam.isEmpty()) {
-        selectedUserId = Integer.parseInt(selectedUserIdParam);
-    } else if (!potentialUsers.isEmpty()) {
-        selectedUserId = potentialUsers.get(0).getId();
-    } else {
+    if (potentialUsers.isEmpty()) {
         out.println("<h2>No users available to chat.</h2>");
         return;
     }
 
-    if (selectedUserId <= 0 || selectedUserId == userId) {
-        out.println("<h2>Invalid user selected.</h2>");
-        return;
+    // Choose the chat partner: ?userId=... if it names an available user, otherwise the first one.
+    int requestedId = InputUtil.parseId(request.getParameter("userId"));
+    User selected = null;
+    for (User u : potentialUsers) {
+        if (u.getId() == requestedId) { selected = u; break; }
     }
+    if (selected == null) {
+        if (request.getParameter("userId") != null && !request.getParameter("userId").isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user selected.");
+            return;
+        }
+        selected = potentialUsers.get(0);
+    }
+    int selectedUserId = selected.getId();
 
-    // Get or create private conversation
+    // Get or create the private conversation (history is fetched by chat.js via /loadMessages)
     int conversationId = chatService.getOrCreatePrivateConversation(userId, selectedUserId);
-
-    // Load previous messages
-    List<ChatMessage> messages = chatService.loadMessages(conversationId, 1000, 0);
-
-    String CONTEXT_PATH = request.getContextPath();
 %>
 
 <!DOCTYPE html>
@@ -59,10 +59,11 @@
             <span class="logo-text">Ethiomentor</span>
         </div>
         <nav class="sidebar-nav">
+            <a class="nav-item" href="<%=CONTEXT_PATH + SessionUtil.homeFor(me)%>">← Dashboard</a>
             <% for (User u : potentialUsers) { %>
                 <a class="nav-item <%= (u.getId() == selectedUserId) ? "active" : "" %>"
                    href="<%=CONTEXT_PATH%>/chat.jsp?userId=<%=u.getId()%>">
-                    <%=u.getFullName()%> (<%=u.getRole()%>)
+                    <%=InputUtil.escapeHtml(u.getFullName())%> (<%=InputUtil.escapeHtml(u.getRole())%>)
                 </a>
             <% } %>
         </nav>
@@ -78,14 +79,7 @@
                     <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" width="50" height="50">
 
                     <div>
-                        <strong>
-                            <%= potentialUsers.stream()
-                                .filter(u -> u.getId() == selectedUserId)
-                                .findFirst()
-                                .map(User::getFullName)
-                                .orElse("User") %>
-                        </strong>
-                        <span class="status">● Online</span>
+                        <strong><%= InputUtil.escapeHtml(selected.getFullName()) %></strong>
                     </div>
                 </div>
             </div>
@@ -95,7 +89,7 @@
 
             <!-- Input -->
             <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Type your message…">
+                <input type="text" id="messageInput" placeholder="Type your message…" maxlength="2000">
                 <button onclick="sendMessage()">Send</button>
             </div>
 
@@ -108,24 +102,7 @@
 const USER_ID = <%= userId %>;
 const SELECTED_USER_ID = <%= selectedUserId %>;
 const CONVERSATION_ID = <%= conversationId %>;
-const CONTEXT_PATH = "<%=CONTEXT_PATH%>";
-
-const CHAT_HISTORY = [
-<% for (ChatMessage m : messages) {
-       String contentEscaped = m.getContent()
-                               .replace("\\","\\\\")
-                               .replace("\"","\\\"")
-                               .replace("\n","\\n")
-                               .replace("\r",""); %>
-{
-    id: <%= m.getId() %>,
-    senderId: <%= m.getSenderId() %>,
-    recipientId: <%= (m.getRecipientId() != null) ? m.getRecipientId() : "null" %>,
-    content: "<%= contentEscaped %>",
-    timestamp: "<%= m.getTimestamp() %>"
-},
-<% } %>
-];
+const CONTEXT_PATH = "<%= CONTEXT_PATH %>";
 </script>
 
 <script src="<%=CONTEXT_PATH%>/js/chat.js"></script>

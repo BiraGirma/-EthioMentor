@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     
 </head>
@@ -26,17 +26,17 @@
         <header class="hero">
             <div class="hero-pattern"></div>
             <div class="hero-left">
-                <h2>Selam, ${user.fullName.split(' ')[0]} 👋</h2>
+                <h2>Selam, <c:out value="${user.fullName.split(' ')[0]}"/> 👋</h2>
                 <p>Welcome back to your mentor dashboard! Here you can view your mentees, manage study groups, and track your community impact.</p>
             </div>
             <div class="hero-right">
                 <div class="hero-stat">
-                    <span>Mentees Assigned</span>
-                    <strong>${menteesCount}</strong>
+                    <span>Mentees</span>
+                    <strong><c:out value="${menteesCount}"/></strong>
                 </div>
                 <div class="hero-stat">
                     <span>Study Groups Managed</span>
-                    <strong>${studyGroupsCount}</strong>
+                    <strong><c:out value="${studyGroupsCount}"/></strong>
                 </div>
             </div>
         </header>
@@ -51,17 +51,17 @@
                 <div class="mini-stats">
                     <div class="mini-card">
                         <span>Total Mentors</span>
-                        <strong>${mentorsCount}</strong>
+                        <strong><c:out value="${mentorsCount}"/></strong>
                         <em>⭐</em>
                     </div>
                     <div class="mini-card">
                         <span>Messages</span>
-                        <strong>${messagesCount}</strong>
+                        <strong><c:out value="${messagesCount}"/></strong>
                         <em>✉️</em>
                     </div>
                     <div class="mini-card">
                         <span>Active Groups</span>
-                        <strong>${activeGroupsCount}</strong>
+                        <strong><c:out value="${activeGroupsCount}"/></strong>
                         <em>👥</em>
                     </div>
                 </div>
@@ -108,10 +108,10 @@
             labels: ['Study Groups', 'Mentees', 'Mentors', 'Messages'],
             datasets: [{
                 data: [
-                    ${studyGroupsCount},
-                    ${menteesCount},
-                    ${mentorsCount},
-                    ${messagesCount}
+                    <c:out value="${studyGroupsCount + 0}"/>,
+                    <c:out value="${menteesCount + 0}"/>,
+                    <c:out value="${mentorsCount + 0}"/>,
+                    <c:out value="${messagesCount + 0}"/>
                 ],
                 backgroundColor: '#D4AF37',
                 borderRadius: 8

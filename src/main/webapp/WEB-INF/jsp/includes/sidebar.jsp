@@ -16,22 +16,22 @@
     <nav class="sidebar-nav">
         <c:choose>
             <c:when test="${userRole eq 'mentor'}">
-                <a href="mentor-dashboard" class="nav-item">📊 Dashboard</a>
-                <a href="studygroups.jsp" class="nav-item">👥 Study Groups</a>
-                <a href="chat.jsp" class="nav-item">✉️ Messages</a>
+                <a href="${pageContext.request.contextPath}/mentor-dashboard" class="nav-item">📊 Dashboard</a>
+                <a href="${pageContext.request.contextPath}/studygroups" class="nav-item">👥 Study Groups</a>
+                <a href="${pageContext.request.contextPath}/chat.jsp" class="nav-item">✉️ Messages</a>
             </c:when>
 
             <c:when test="${userRole eq 'admin'}">
-                <a href="admin" class="nav-item">🛡️ Admin</a>
-                <a href="studygroups.jsp" class="nav-item">👥 Study Groups</a>
-                <a href="chat.jsp" class="nav-item">✉️ Messages</a>
+                <a href="${pageContext.request.contextPath}/admin" class="nav-item">🛡️ Admin</a>
+                <a href="${pageContext.request.contextPath}/studygroups" class="nav-item">👥 Study Groups</a>
+                <a href="${pageContext.request.contextPath}/chat.jsp" class="nav-item">✉️ Messages</a>
             </c:when>
 
             <c:otherwise>
-                <a href="dashboard" class="nav-item">📊 Dashboard</a>
-                <a href="studygroups.jsp" class="nav-item">👥 Study Groups</a>
-                <a href="MentorMatching.jsp" class="nav-item">🤝 Mentor Matching</a>
-                <a href="chat.jsp" class="nav-item">✉️ Messages</a>
+                <a href="${pageContext.request.contextPath}/dashboard" class="nav-item">📊 Dashboard</a>
+                <a href="${pageContext.request.contextPath}/studygroups" class="nav-item">👥 Study Groups</a>
+                <a href="${pageContext.request.contextPath}/MentorMatching.jsp" class="nav-item">🤝 Mentor Matching</a>
+                <a href="${pageContext.request.contextPath}/chat.jsp" class="nav-item">✉️ Messages</a>
             </c:otherwise>
         </c:choose>
     </nav>

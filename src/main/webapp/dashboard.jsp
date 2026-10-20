@@ -1,14 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Ethiomentor | Dashboard</title>
 
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/sidebar.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sidebar.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 
 <body>
@@ -30,7 +31,7 @@
 
                 <div class="hero-left">
                     <h2>
-                        Selam, ${user.getFullName().split(' ')[0]}
+                        Selam, <c:out value="${user.fullName.split(' ')[0]}"/>
                         <span class="tibeb-badge">ጤና ይስጥልኝ</span>
                     </h2>
 
@@ -160,10 +161,10 @@ new Chart(document.getElementById('communityChart'), {
         labels: ['Study Groups', 'Mentors', 'Mentees', 'Discussions'],
         datasets: [{
             data: [
-                ${studyGroupsCount},
-                ${mentorsCount},
-                ${menteesCount},
-                ${discussionsCount}
+                <c:out value="${studyGroupsCount + 0}"/>,
+                <c:out value="${mentorsCount + 0}"/>,
+                <c:out value="${menteesCount + 0}"/>,
+                <c:out value="${discussionsCount + 0}"/>
             ],
             backgroundColor: '#076921',
             borderRadius: 8
@@ -175,32 +176,12 @@ new Chart(document.getElementById('communityChart'), {
     }
 });
 
+// (sidebar collapse is handled by the included sidebar.jsp; registering it twice would cancel it out)
 document.addEventListener("DOMContentLoaded", () => {
-    const sidebar = document.getElementById("sidebar");
-    const collapseBtn = document.getElementById("collapseBtn");
-    const mainContent = document.querySelector(".main-content");
-
-    // Load saved collapsed state
-    const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
-    if (isCollapsed) {
-        sidebar.classList.add('collapsed');
-        if (mainContent) mainContent.classList.add('collapsed');
-    }
-
-    // Collapse toggle
-    collapseBtn.addEventListener("click", () => {
-        sidebar.classList.toggle('collapsed');
-        if (mainContent) mainContent.classList.toggle('collapsed');
-
-        // Save state
-        localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
-    });
-
     // Highlight active nav-item based on URL
     const navItems = document.querySelectorAll(".sidebar .nav-item");
     navItems.forEach(item => {
-        const href = item.getAttribute("href");
-        if (window.location.pathname.endsWith(href)) {
+        if (window.location.pathname === item.pathname) {
             item.classList.add("active");
         } else {
             item.classList.remove("active");

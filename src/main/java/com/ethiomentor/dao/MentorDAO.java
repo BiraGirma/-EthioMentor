@@ -9,12 +9,17 @@ import java.util.List;
 
 public class MentorDAO {
 
-    // Fetch all mentors
-    public List<MentorProfile> getAllMentors() throws Exception {
+    /**
+     * Mentors shown in Mentor Matching: admin-approved and not deactivated.
+     * (Newly registered mentors are PENDING until an admin approves them.)
+     */
+    public List<MentorProfile> getAllMentors() throws SQLException {
         List<MentorProfile> mentors = new ArrayList<>();
-        String sql = "SELECT u.id, u.full_name, u.username, u.email, u.university, m.expertise " +
-                     "FROM users u LEFT JOIN mentors m ON m.user_id = u.id " +
-                     "WHERE u.role = 'mentor'";
+        String sql = "SELECT u.id, u.full_name, u.username, u.email, u.university, " +
+                     "       (SELECT string_agg(m.expertise, ',') FROM mentors m WHERE m.user_id = u.id) AS expertise " +
+                     "FROM users u " +
+                     "WHERE u.role = 'mentor' AND u.mentor_status = 'APPROVED' AND u.is_active " +
+                     "ORDER BY u.full_name";
 
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -23,71 +28,36 @@ public class MentorDAO {
             while (rs.next()) {
                 MentorProfile m = new MentorProfile();
                 m.setId(rs.getInt("id"));
+                m.setUserId(rs.getInt("id"));
                 m.setName(rs.getString("full_name"));
                 m.setUsername(rs.getString("username"));
                 m.setEmail(rs.getString("email"));
                 m.setUniversity(rs.getString("university"));
 
                 String exp = rs.getString("expertise");
-                m.setExpertise(exp != null && !exp.isEmpty() ? exp.split(",") : new String[]{});
-
+                m.setExpertise(exp != null && !exp.isBlank() ? exp.split("\\s*,\\s*") : new String[]{});
                 mentors.add(m);
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return mentors;
     }
 
-    // Save a new mentor profile (transaction-safe)
-    public void saveProfile(MentorProfile profile) throws Exception {
-        Connection conn = null;
-        PreparedStatement psUser = null;
-        PreparedStatement psMentor = null;
-        ResultSet generatedKeys = null;
-
-        try {
-            conn = DBConfig.getConnection();
-            conn.setAutoCommit(false); // transaction
-
-            // Insert into users table
-            String sqlUser = "INSERT INTO users (username, full_name, email, password, role, university) " +
-                             "VALUES (?, ?, ?, ?, 'mentor', ?)";
-            psUser = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS);
-            psUser.setString(1, profile.getUsername());
-            psUser.setString(2, profile.getName());
-            psUser.setString(3, profile.getEmail());
-            psUser.setString(4, "password123"); // default password; ideally hashed
-            psUser.setString(5, profile.getUniversity());
-            psUser.executeUpdate();
-
-            generatedKeys = psUser.getGeneratedKeys();
-            int userId = 0;
-            if (generatedKeys.next()) {
-                userId = generatedKeys.getInt(1);
-            } else {
-                throw new SQLException("Creating user failed, no ID obtained.");
+    /** Stores a mentor's comma-separated expertise (replaces any previous value). */
+    public void saveExpertise(int userId, String expertiseCsv) throws SQLException {
+        try (Connection conn = DBConfig.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement del = conn.prepareStatement("DELETE FROM mentors WHERE user_id = ?");
+                 PreparedStatement ins = conn.prepareStatement("INSERT INTO mentors (user_id, expertise) VALUES (?, ?)")) {
+                del.setInt(1, userId);
+                del.executeUpdate();
+                ins.setInt(1, userId);
+                ins.setString(2, expertiseCsv);
+                ins.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-
-            // Insert into mentors table
-            String sqlMentor = "INSERT INTO mentors (user_id, expertise) VALUES (?, ?)";
-            psMentor = conn.prepareStatement(sqlMentor);
-            psMentor.setInt(1, userId);
-            psMentor.setString(2, String.join(",", profile.getExpertise()));
-            psMentor.executeUpdate();
-
-            conn.commit();
-
-        } catch (SQLException e) {
-            if (conn != null) conn.rollback();
-            e.printStackTrace();
-            throw new Exception("Failed to save mentor profile: " + e.getMessage());
-        } finally {
-            if (generatedKeys != null) generatedKeys.close();
-            if (psMentor != null) psMentor.close();
-            if (psUser != null) psUser.close();
-            if (conn != null) conn.close();
         }
     }
 }

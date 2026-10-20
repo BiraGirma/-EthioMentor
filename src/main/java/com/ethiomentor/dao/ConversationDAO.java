@@ -98,4 +98,16 @@ public class ConversationDAO {
         }
         return participants;
     }
+
+    public boolean isParticipant(int conversationId, int userId) throws Exception {
+        String sql = "SELECT 1 FROM conversation_participants WHERE conversation_id=? AND user_id=?";
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, conversationId);
+            ps.setInt(2, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
 }

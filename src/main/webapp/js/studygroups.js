@@ -1,3 +1,6 @@
+const CTX = (document.querySelector('meta[name="ctx"]') || {}).content || "";
+const CSRF = (document.querySelector('meta[name="csrf-token"]') || {}).content || "";
+
 // MODAL CONTROLS
 function openModal() {
     document.getElementById("groupModal").classList.add("show");
@@ -7,44 +10,45 @@ function closeModal() {
     document.getElementById("groupModal").classList.remove("show");
 }
 
+// POST helper: urlencoded body (multipart is not parsed by the servlets) plus CSRF header
+function post(path, params) {
+    return fetch(CTX + path, {
+        method: "POST",
+        headers: { "X-CSRF-Token": CSRF },
+        body: params
+    }).then(res => res.json().then(body => {
+        if (!res.ok) throw new Error(body.error || ("HTTP " + res.status));
+        return body;
+    }));
+}
+
 // CREATE GROUP AJAX
-document.getElementById("createGroupForm").addEventListener("submit", function(e){
+document.getElementById("createGroupForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
-    fetch("studygroups/create", {
-        method: "POST",
-        body: new FormData(this)
-    })
-    .then(res => res.json())
-    .then(data => {
-        closeModal();
-        location.reload(); // refresh to show new group
-    })
-    .catch(() => alert("Failed to create group"));
+    post("/studygroups/create", new URLSearchParams(new FormData(this)))
+        .then(() => {
+            closeModal();
+            location.reload(); // refresh to show new group
+        })
+        .catch(err => alert("Failed to create group: " + err.message));
 });
 
 // JOIN GROUP AJAX
-function joinGroup(groupId, btn){
-    const data = new URLSearchParams();
-    data.append("groupId", groupId);
+function joinGroup(groupId, btn) {
+    post("/studygroups/join", new URLSearchParams({ groupId: groupId }))
+        .then(res => {
+            btn.textContent = "Already Member";
+            btn.disabled = true;
+            btn.classList.add("disabled");
 
-    fetch("studygroups/join", {
-        method: "POST",
-        body: data
-    })
-    .then(res => res.json())
-    .then(res => {
-        btn.textContent = "Already Member";
-        btn.disabled = true;
-        btn.classList.add("disabled");
-
-        const counter = document.querySelector(`#group-${groupId} .members-count`);
-        if(counter) counter.textContent = res.membersCount + " members";
-    })
-    .catch(() => alert("Could not join group"));
+            const counter = document.querySelector(`#group-${groupId} .members-count`);
+            if (counter) counter.textContent = res.membersCount + " members";
+        })
+        .catch(err => alert("Could not join group: " + err.message));
 }
 
 // CLOSE MODAL BY CLICKING OUTSIDE
 document.getElementById("groupModal").addEventListener("click", e => {
-    if(e.target.id === "groupModal") closeModal();
+    if (e.target.id === "groupModal") closeModal();
 });

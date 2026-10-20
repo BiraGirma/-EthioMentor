@@ -1,14 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page session="true" %>
+<%-- JS template literals below use ${...}; keep the JSP container from evaluating them as EL. --%>
+<%@ page isELIgnored="true" %>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Ethiomentor | Mentor Matching</title>
 
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/sidebar.css">
-    <link rel="stylesheet" href="css/mentormatching.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/global.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/sidebar.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/mentormatching.css">
 </head>
 
 <body>
@@ -45,13 +47,20 @@ const findBtn = document.getElementById("findMentorsBtn");
 const loading = document.getElementById("loading");
 const error = document.getElementById("errorMsg");
 const list = document.getElementById("mentorList");
+const CTX = "<%=request.getContextPath()%>";
+
+// Mentor data comes from the database: always escape before putting it into HTML.
+function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, c =>
+        ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
 
 findBtn.addEventListener("click", function() {
     loading.style.display = "block";
     error.style.display = "none";
     list.innerHTML = "";
 
-    fetch('<%=request.getContextPath()%>/mentormatching')
+    fetch(CTX + '/mentormatching')
         .then(res => res.json())
         .then(data => {
             loading.style.display = "none";
@@ -65,7 +74,7 @@ findBtn.addEventListener("click", function() {
             if (data.length === 0) {
                 list.innerHTML = `
                     <div class="no-mentors">
-                        <p>No suggestions yet. Click the button above to start.</p>
+                        <p>No approved mentors are available yet.</p>
                     </div>`;
                 return;
             }
@@ -76,24 +85,23 @@ findBtn.addEventListener("click", function() {
 
                 let expertiseHtml = "";
                 mentor.expertise.forEach(skill => {
-                    expertiseHtml += `<span>${skill}</span>`;
+                    expertiseHtml += `<span>${esc(skill)}</span>`;
                 });
 
                 div.innerHTML = `
                     <div class="mentor-top-bar"></div>
                     <div class="mentor-content">
                         <div class="mentor-info">
-                            <img src="https://picsum.photos/seed/${mentor.id}/100/100">
+                            <img src="https://picsum.photos/seed/${encodeURIComponent(mentor.id)}/100/100" alt="">
                             <div>
-                                <h4>${mentor.name}</h4>
-                                <p>${mentor.university}</p>
+                                <h4>${esc(mentor.name)}</h4>
+                                <p>${esc(mentor.university)}</p>
                             </div>
                         </div>
                         <div class="mentor-expertise">${expertiseHtml}</div>
                     </div>
                     <div class="mentor-actions">
-                        <a href="messaging.jsp?mentorId=${mentor.id}" class="btn-contact">Contact</a>
-                        <a href="profile.jsp?id=${mentor.id}" class="btn-profile">View Profile</a>
+                        <a href="${CTX}/chat.jsp?userId=${encodeURIComponent(mentor.id)}" class="btn-contact">Contact</a>
                     </div>
                 `;
                 list.appendChild(div);

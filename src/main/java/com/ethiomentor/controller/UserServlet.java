@@ -2,116 +2,81 @@ package com.ethiomentor.controller;
 
 import com.ethiomentor.model.User;
 import com.ethiomentor.service.UserService;
-import com.ethiomentor.util.PasswordUtil;
 import com.ethiomentor.util.JsonUtil;
+import com.ethiomentor.util.SessionUtil;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+/** Profile API for the logged-in user: GET reads it, PUT updates name/email/university/password. */
 @WebServlet("/api/user")
 public class UserServlet extends HttpServlet {
 
     private final UserService userService = new UserService();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
-
-        resp.setContentType("application/json");
-        HttpSession session = req.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            JsonUtil.send(resp, 401, "{\"error\":\"Unauthorized\"}");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        User user = SessionUtil.currentUser(req);
+        if (user == null) {
+            JsonUtil.error(resp, 401, "Unauthorized");
             return;
         }
-
-        User user = (User) session.getAttribute("user");
-        String json = "{"
-                + "\"id\":" + user.getId() + ","
-                + "\"username\":\"" + escape(user.getUsername()) + "\","
-                + "\"fullName\":\"" + escape(user.getFullName()) + "\","
-                + "\"email\":\"" + escape(user.getEmail()) + "\","
-                + "\"role\":\"" + escape(user.getRole()) + "\","
-                + "\"university\":\"" + escape(user.getUniversity()) + "\""
-                + "}";
-
-        JsonUtil.send(resp, 200, json);
+        JsonUtil.send(resp, 200, new JSONObject()
+                .put("id", user.getId())
+                .put("username", nz(user.getUsername()))
+                .put("fullName", nz(user.getFullName()))
+                .put("email", nz(user.getEmail()))
+                .put("role", nz(user.getRole()))
+                .put("university", nz(user.getUniversity())));
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
-
-        resp.setContentType("application/json");
-        HttpSession session = req.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            JsonUtil.send(resp, 401, "{\"error\":\"Unauthorized\"}");
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        User user = SessionUtil.currentUser(req);
+        if (user == null) {
+            JsonUtil.error(resp, 401, "Unauthorized");
             return;
         }
 
-        User user = (User) session.getAttribute("user");
-
-        // Read request body
         StringBuilder sb = new StringBuilder();
         try (BufferedReader reader = req.getReader()) {
-            String line;
-            while ((line = reader.readLine()) != null) sb.append(line);
-        }
-        String body = sb.toString();
-
-        // Extract JSON values manually
-        String fullName = getJsonValue(body, "fullName");
-        String email = getJsonValue(body, "email");
-        String university = getJsonValue(body, "university");
-        String password = getJsonValue(body, "password");
-
-        if (fullName != null) user.setFullName(fullName.trim());
-        if (email != null) user.setEmail(email.trim());
-        if (university != null) user.setUniversity(university.trim());
-        if (password != null && !password.isEmpty()) {
-            try {
-                user.setPassword(PasswordUtil.hash(password));
-            } catch (Exception e) {
-                e.printStackTrace();
-                JsonUtil.send(resp, 500, "{\"error\":\"Password hashing failed\"}");
-                return;
+            char[] buf = new char[1024];
+            int n;
+            while ((n = reader.read(buf)) != -1) {
+                sb.append(buf, 0, n);
+                if (sb.length() > 16_384) {
+                    JsonUtil.error(resp, 413, "Request too large");
+                    return;
+                }
             }
         }
 
-        boolean updated = userService.updateUser(user);
-        if (updated) {
-            session.setAttribute("user", user);
-            JsonUtil.send(resp, 200, "{\"message\":\"User updated successfully\"}");
+        JSONObject body;
+        try {
+            body = new JSONObject(sb.toString());
+        } catch (JSONException e) {
+            JsonUtil.error(resp, 400, "Invalid JSON");
+            return;
+        }
+
+        String error = userService.updateProfile(user,
+                body.optString("fullName", null),
+                body.optString("email", null),
+                body.optString("university", null),
+                body.optString("password", null));
+
+        if (error == null) {
+            JsonUtil.send(resp, 200, new JSONObject().put("message", "User updated successfully"));
         } else {
-            JsonUtil.send(resp, 500, "{\"error\":\"Update failed\"}");
+            JsonUtil.error(resp, 400, error);
         }
     }
 
-    /** Escape JSON special characters */
-    private String escape(String s) {
-        if (s == null) return "";
-        return s.replace("\\", "\\\\").replace("\"", "\\\"");
-    }
-
-    /** Extract value from flat JSON like {"key":"value"} without regex */
-    private String getJsonValue(String json, String key) {
-        if (json == null || key == null) return null;
-        String pattern = "\"" + key + "\"";
-        int index = json.indexOf(pattern);
-        if (index == -1) return null;
-
-        // Find the colon
-        int colon = json.indexOf(":", index);
-        if (colon == -1) return null;
-
-        // Find starting quote
-        int startQuote = json.indexOf("\"", colon);
-        if (startQuote == -1) return null;
-
-        int endQuote = json.indexOf("\"", startQuote + 1);
-        if (endQuote == -1) return null;
-
-        return json.substring(startQuote + 1, endQuote);
+    private static String nz(String s) {
+        return s == null ? "" : s;
     }
 }

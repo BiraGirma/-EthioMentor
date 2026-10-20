@@ -50,7 +50,7 @@
 
       <!-- ERROR MESSAGE -->
       <c:if test="${not empty error}">
-        <div class="error">${error}</div>
+        <div class="error"><c:out value="${error}"/></div>
       </c:if>
 
       <!-- AUTH FORM -->

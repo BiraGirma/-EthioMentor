@@ -38,7 +38,10 @@ The backend is built using **Java Servlets ☕** and **JSP**, with a **PostgreSQ
 
 ```
 Ethiomentor/
-├── pom.xml
+├── build.sh              # build without an IDE (see Linux Mint section)
+├── scripts/
+│   ├── test.sh           # automated tests (add --db for database tests)
+│   └── smoke-test.sh     # end-to-end HTTP test against a running server
 └── src/
     └── main/
         ├── java/
@@ -157,6 +160,98 @@ Ethiomentor/
 ---
 
 ## Installation & Setup ⚙️
+
+### Run on Linux Mint (no IDE required)
+
+Target platform: Linux Mint 22.x. Needs a JDK (17 or newer), PostgreSQL, and Apache Tomcat 9. Nothing else is required — no Maven or Gradle.
+
+**1. Install Java and PostgreSQL**
+
+```bash
+sudo apt update
+sudo apt install -y openjdk-17-jdk postgresql postgresql-client
+```
+
+**2. Set a password for the PostgreSQL `postgres` user**
+
+```bash
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'choose-a-db-password';"
+```
+
+**3. Install Tomcat 9**
+
+Download the Tomcat **9.0.x** "core" `tar.gz` from https://tomcat.apache.org/download-90.cgi and extract it, for example to `~/apache-tomcat-9.0.x`. Tomcat 10 and newer will **not** work (the code uses `javax.*` APIs).
+
+**4. Build the WAR**
+
+```bash
+cd ~/path/to/EthioMentor
+export CATALINA_HOME=$HOME/apache-tomcat-9.0.x
+./build.sh            # produces build/EthioMentor.war
+```
+
+**5. Deploy and start**
+
+```bash
+export DB_PASSWORD='choose-a-db-password'
+export ADMIN_INITIAL_PASSWORD='choose-an-admin-password'   # used only when the admin account is first created
+cp build/EthioMentor.war "$CATALINA_HOME/webapps/"
+"$CATALINA_HOME/bin/catalina.sh" run
+```
+
+Keep the terminal open while the server runs. Stop it with `Ctrl+C`.
+
+**6. Open the app**
+
+http://localhost:8080/EthioMentor/
+
+On first start the app creates the `ethiomentors` database and all tables. The admin account is `admin`; its password is the value of `ADMIN_INITIAL_PASSWORD`. If that variable was not set, a one-time password is printed in `$CATALINA_HOME/logs/catalina.out`. Log in and change it.
+
+**Configuration reference (environment variables)**
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `DB_PASSWORD` | none (required) | PostgreSQL password |
+| `DB_URL` | built from the variables below | Full JDBC URL, overrides the rest |
+| `DB_HOST` | `localhost` | PostgreSQL host |
+| `DB_PORT` | `5432` | PostgreSQL port |
+| `DB_NAME` | `ethiomentors` | Database name |
+| `DB_USER` | `postgres` | Database user |
+| `ADMIN_INITIAL_PASSWORD` | random, printed once | Password for the first `admin` account |
+
+Never put real passwords in files that are committed to Git. Export them in your shell, or in a `bin/setenv.sh` file inside your Tomcat folder (not in this repository).
+
+**Tests**
+
+```bash
+CATALINA_HOME=$HOME/apache-tomcat-9.0.x scripts/test.sh               # unit tests
+CATALINA_HOME=$HOME/apache-tomcat-9.0.x DB_PASSWORD='...' scripts/test.sh --db   # + database tests
+```
+
+The database tests use scratch databases named `ethiomentor_test` and `ethiomentor_migration_test`, which are dropped and recreated. Your real database is not touched.
+
+With the server running:
+
+```bash
+ADMIN_PASSWORD='your-admin-password' scripts/smoke-test.sh
+```
+
+Only run the smoke test against a development database; it creates throw-away users and groups.
+
+**Troubleshooting**
+
+- `Cannot find Tomcat's servlet-api.jar` — `CATALINA_HOME` is not set or does not point to Tomcat 9.
+- `Database initialization failed` — PostgreSQL is not running (`sudo systemctl status postgresql`) or `DB_PASSWORD` is wrong. Check `logs/catalina.out`.
+- Port 8080 already in use — stop the other program, or change the `Connector` port in `$CATALINA_HOME/conf/server.xml`.
+- Old `admin/admin123` account still exists — the server logs a security warning. Change that password.
+
+**Known limitations**
+
+- Mentor-to-mentee assignment is not implemented; the mentor dashboard's mentee count is derived from existing conversations.
+- The Java 17 build was not run on Tomcat in the environment where this README was written; treat the commands above as the expected path and report any failure.
+- Git history contains a database password from an earlier version of `DBConfig.java`. That password must be rotated; removing it from the current files does not remove it from history.
+
+---
 
 ### Project Setup Guide (Eclipse + JDK 18 + Apache Tomcat)
 
