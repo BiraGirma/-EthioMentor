@@ -39,59 +39,71 @@
 
     // Get or create the private conversation (history is fetched by chat.js via /loadMessages)
     int conversationId = chatService.getOrCreatePrivateConversation(userId, selectedUserId);
+
+    String initials = "";
+    for (String part : selected.getFullName().trim().split("\\s+")) {
+        if (!part.isEmpty() && initials.length() < 2) initials += part.substring(0, 1).toUpperCase();
+    }
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Chat | Ethiomentor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Messages | EthioMentor</title>
     <link rel="stylesheet" href="<%=CONTEXT_PATH%>/css/global.css">
+    <link rel="stylesheet" href="<%=CONTEXT_PATH%>/css/app-shell.css">
     <link rel="stylesheet" href="<%=CONTEXT_PATH%>/css/chat.css">
+    <script defer src="<%=CONTEXT_PATH%>/js/shell.js"></script>
 </head>
 <body>
 
 <div class="app-layout">
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <span class="logo-mark">◆</span>
-            <span class="logo-text">Ethiomentor</span>
-        </div>
-        <nav class="sidebar-nav">
-            <a class="nav-item" href="<%=CONTEXT_PATH + SessionUtil.homeFor(me)%>">← Dashboard</a>
-            <% for (User u : potentialUsers) { %>
-                <a class="nav-item <%= (u.getId() == selectedUserId) ? "active" : "" %>"
-                   href="<%=CONTEXT_PATH%>/chat.jsp?userId=<%=u.getId()%>">
-                    <%=InputUtil.escapeHtml(u.getFullName())%> (<%=InputUtil.escapeHtml(u.getRole())%>)
-                </a>
-            <% } %>
-        </nav>
-    </aside>
+    <jsp:include page="WEB-INF/jsp/includes/sidebar.jsp"/>
 
-    <!-- Main Chat Area -->
-    <main class="main-content">
-        <div class="chat-container">
+    <main class="main-content chat-page">
+        <div class="chat-layout">
 
-            <!-- Chat Header -->
-            <div class="chat-header">
-                <div class="chat-user">
-                    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" width="50" height="50">
+            <!-- Conversation list -->
+            <aside class="chat-contacts" aria-labelledby="contactsHeading">
+                <h1 id="contactsHeading" class="chat-contacts-title">Messages</h1>
+                <nav aria-label="Conversations">
+                    <ul class="contact-list">
+                        <% for (User u : potentialUsers) {
+                               boolean current = u.getId() == selectedUserId; %>
+                        <li>
+                            <a class="contact<%= current ? " active" : "" %>"
+                               href="<%=CONTEXT_PATH%>/chat.jsp?userId=<%=u.getId()%>"
+                               <%= current ? "aria-current=\"page\"" : "" %>>
+                                <span class="contact-name"><%=InputUtil.escapeHtml(u.getFullName())%></span>
+                                <span class="contact-role"><%=InputUtil.escapeHtml(u.getRole())%></span>
+                            </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </nav>
+            </aside>
 
+            <!-- Conversation -->
+            <section class="chat-container" aria-labelledby="chatWithHeading">
+                <header class="chat-header">
+                    <span class="chat-avatar" aria-hidden="true"><%=InputUtil.escapeHtml(initials)%></span>
                     <div>
-                        <strong><%= InputUtil.escapeHtml(selected.getFullName()) %></strong>
+                        <h2 id="chatWithHeading" class="chat-with"><%=InputUtil.escapeHtml(selected.getFullName())%></h2>
+                        <span class="chat-role"><%=InputUtil.escapeHtml(selected.getRole())%></span>
                     </div>
-                </div>
-            </div>
+                </header>
 
-            <!-- Messages -->
-            <div id="chatMessages" class="chat-messages"></div>
+                <div id="chatMessages" class="chat-messages" role="log" aria-live="polite" aria-label="Messages"></div>
 
-            <!-- Input -->
-            <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Type your message…" maxlength="2000">
-                <button onclick="sendMessage()">Send</button>
-            </div>
+                <form id="chatForm" class="chat-input" autocomplete="off">
+                    <label class="visually-hidden" for="messageInput">Message</label>
+                    <input type="text" id="messageInput" placeholder="Type your message…" maxlength="2000">
+                    <button type="submit" class="btn-send">Send</button>
+                </form>
+            </section>
 
         </div>
     </main>

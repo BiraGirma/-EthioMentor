@@ -9,8 +9,9 @@
     <title>Ethiomentor | Mentor Matching</title>
 
     <link rel="stylesheet" href="<%=request.getContextPath()%>/css/global.css">
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/sidebar.css">
     <link rel="stylesheet" href="<%=request.getContextPath()%>/css/mentormatching.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <script defer src="/js/shell.js"></script>
 </head>
 
 <body>

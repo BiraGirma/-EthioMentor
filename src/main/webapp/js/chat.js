@@ -69,9 +69,11 @@ function sendMessage() {
     input.value = "";
 }
 
+// Enter and the Send button both submit the form, so sending has one code path.
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("messageInput").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") { e.preventDefault(); sendMessage(); }
+    document.getElementById("chatForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        sendMessage();
     });
 });
 

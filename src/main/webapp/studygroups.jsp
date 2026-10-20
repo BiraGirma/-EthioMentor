@@ -9,6 +9,8 @@
     <meta name="ctx" content="${pageContext.request.contextPath}">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/studygroups.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <script defer src="/js/shell.js"></script>
 </head>
 <body>
 

@@ -7,11 +7,12 @@
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sidebar.css">
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <script defer src="/js/shell.js"></script>
 </head>
 <body>
 
-<div class="app-layout d-flex">
+<div class="app-layout">
 
     <!-- SIDEBAR -->
     <jsp:include page="WEB-INF/jsp/includes/sidebar.jsp"/>

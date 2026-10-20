@@ -6,10 +6,11 @@
     <title>Ethiomentor | Dashboard</title>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sidebar.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/css/app-shell.css">
+    <script defer src="/js/shell.js"></script>
 </head>
 
 <body>
